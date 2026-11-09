@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SQL-Einführung</title>
+<style>
+  :root { --bg:#fff; --fg:#1d2330; --muted:#667085; --line:#d9dee7; --panel:#f5f7fa; --accent:#0b5fff; --ok:#12805c; --bad:#c0392b; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#12151c; --fg:#e8ebf1; --muted:#9aa3b2; --line:#2b3140; --panel:#1a1f2a; --accent:#6b9bff; --ok:#43c59e; --bad:#ff7b6b; } }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.45 system-ui,sans-serif; display:grid; grid-template-columns:300px 1fr; height:100vh; }
+  aside { border-right:1px solid var(--line); overflow:auto; padding:12px; background:var(--panel); }
+  main { overflow:auto; padding:16px 20px; }
+  h1 { font-size:18px; margin:0 0 8px; } h2 { font-size:15px; margin:14px 0 6px; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; }
+  .ex { display:block; width:100%; text-align:left; border:0; background:none; color:inherit; padding:6px 8px; border-radius:6px; cursor:pointer; font:inherit; }
+  .ex:hover, .ex.active { background:var(--line); } .ex .done::before { content:"✓ "; color:var(--ok); }
+  textarea { width:100%; height:150px; font:15px/1.4 ui-monospace,Menlo,monospace; background:var(--panel); color:var(--fg); border:1px solid var(--line); border-radius:8px; padding:10px; resize:vertical; }
+  button.act { background:var(--accent); color:#fff; border:0; border-radius:8px; padding:8px 14px; font:inherit; cursor:pointer; margin:8px 8px 8px 0; }
+  button.sec { background:none; color:var(--accent); border:1px solid var(--line); }
+  table { border-collapse:collapse; margin-top:8px; font-size:14px; } th, td { border:1px solid var(--line); padding:4px 10px; text-align:left; } th { background:var(--panel); }
+  .msg { margin:8px 0; font-weight:600; } .ok { color:var(--ok); } .bad { color:var(--bad); } .muted { color:var(--muted); font-weight:400; }
+  details { margin:6px 0; } code { background:var(--panel); padding:1px 5px; border-radius:4px; } pre { background:var(--panel); padding:10px; border-radius:8px; overflow:auto; }
+  .schema { font-size:13px; } .schema b { display:block; margin-top:6px; } .schema span { color:var(--muted); }
+  @media (max-width: 800px) { body { grid-template-columns:1fr; height:auto; } aside { border-right:0; border-bottom:1px solid var(--line); } }
+</style>
+</head>
+<body>
+<aside>
+  <h1>SQL-Einführung</h1>
+  <div id="list"></div>
+  <h2>Schema</h2>
+  <div id="schema" class="schema"></div>
+  <button class="act sec" id="reset">Datenbank zurücksetzen</button>
+</aside>
+<main>
+  <div id="title"><h1>Freie Abfrage</h1><p class="muted">Links eine Aufgabe wählen, oder hier frei ausprobieren.</p></div>
+  <div id="task"></div>
+  <textarea id="sql" spellcheck="false" placeholder="SELECT ..."></textarea>
+  <div>
+    <button class="act" id="run">Ausführen (Strg+Enter)</button>
+    <button class="act sec" id="check" hidden>Prüfen</button>
+    <button class="act sec" id="solution" hidden>Lösung zeigen</button>
+  </div>
+  <div id="out"></div>
+</main>
+<script>
+const $ = id => document.getElementById(id);
+let exercises = [], current = null, db = "flat";
+const done = new Set(JSON.parse(localStorage.getItem("done") || "[]"));
+
+const esc = s => String(s).replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+async function post(path, body) {
+  const r = await fetch(path, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body)});
+  return r.json();
+}
+function table(res) {
+  if (res.error) return `<div class="msg bad">${esc(res.error)}</div>`;
+  if (!res.columns.length) return `<div class="msg muted">OK, ${res.rowcount} Zeile(n) betroffen.</div>`;
+  const head = res.columns.map(c => `<th>${esc(c)}</th>`).join("");
+  const rows = res.rows.map(r => `<tr>${r.map(v => `<td>${v === null ? '<i class="muted">NULL</i>' : esc(v)}</td>`).join("")}</tr>`).join("");
+  return `<table><tr>${head}</tr>${rows}</table><div class="muted">${res.rows.length} Zeile(n)${res.truncated ? " (gekürzt)" : ""}</div>`;
+}
+async function loadSchema() {
+  const s = await (await fetch(`/api/schema/${db}`)).json();
+  $("schema").innerHTML = s.map(t => `<b>${esc(t.table)}</b><span>${t.columns.map(c => esc(c.name)).join(", ")}</span>`).join("");
+}
+function renderList() {
+  let html = "", lesson = null;
+  for (const e of exercises) {
+    if (e.lesson !== lesson) { lesson = e.lesson; html += `<h2>Lecture ${lesson}</h2>`; }
+    html += `<button class="ex ${current?.id === e.id ? "active" : ""}" data-id="${e.id}"><span class="${done.has(e.id) ? "done" : ""}">${e.id} ${esc(e.title)}</span></button>`;
+  }
+  $("list").innerHTML = html;
+  document.querySelectorAll(".ex").forEach(b => b.onclick = () => select(b.dataset.id));
+}
+async function select(id) {
+  current = exercises.find(e => e.id === id);
+  db = current.db;
+  $("title").innerHTML = `<h1>${esc(current.id)} ${esc(current.title)}</h1>`;
+  $("task").innerHTML = `<p>${esc(current.task).replace(/`([^`]+)`/g, "<code>$1</code>")}</p>` +
+    (current.hint ? `<details><summary>Tipp</summary>${esc(current.hint)}</details>` : "");
+  $("sql").value = ""; $("out").innerHTML = "";
+  $("check").hidden = $("solution").hidden = false;
+  renderList(); loadSchema();
+}
+async function run() { $("out").innerHTML = table(await post("/api/run", {db, sql:$("sql").value})); }
+async function check() {
+  if (!current) return;
+  const r = await post("/api/check", {id:current.id, sql:$("sql").value});
+  if (r.ok) { done.add(current.id); localStorage.setItem("done", JSON.stringify([...done])); renderList(); }
+  $("out").innerHTML = `<div class="msg ${r.ok ? "ok" : "bad"}">${esc(r.message)}</div>` + (r.result ? table(r.result) : "");
+}
+async function solution() {
+  const r = await (await fetch(`/api/solution/${current.id}`)).json();
+  $("out").innerHTML = `<pre>${esc(r.solution)}</pre>`;
+}
+$("run").onclick = run; $("check").onclick = check; $("solution").onclick = solution;
+$("reset").onclick = async () => { await post("/api/reset", {}); $("out").innerHTML = '<div class="msg muted">Zurückgesetzt.</div>'; loadSchema(); };
+$("sql").addEventListener("keydown", e => { if ((e.ctrlKey || e.metaKey) && e.key === "Enter") run(); });
+(async () => { exercises = await (await fetch("/api/exercises")).json(); renderList(); loadSchema(); })();
+</script>
+</body>
+</html>

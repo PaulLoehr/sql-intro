@@ -1,0 +1,24 @@
+[project]
+name = "sqlkurs"
+version = "0.1.0"
+description = "Interactive SQL introduction for HKA, modeled on CS50 SQL lectures 0 and 1"
+authors = [
+    { name = "Simon, Paul - D0413326", email = "paul.simon@dm.de" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "pydantic>=2.14.3",
+]
+
+[project.scripts]
+sqlkurs = "sqlkurs:main"
+
+[build-system]
+requires = ["uv_build>=0.12.22,<0.13.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+test = [
+    "pytest>=9.2.0",
+    "pytest-cov>=7.1.0",
+]

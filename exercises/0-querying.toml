@@ -1,0 +1,76 @@
+# Lesson 0: Querying (CS50 SQL, week 0). Database: flat table `delays`.
+
+[[exercise]]
+id = "0.1"
+lesson = 0
+title = "Erste Abfrage"
+db = "flat"
+task = "Zeige alle Haltestellen-Namen (Spalte `stop`) der Tabelle `delays`. Jede Haltestelle soll nur einmal vorkommen."
+hint = "SELECT DISTINCT ..."
+solution = "SELECT DISTINCT stop FROM delays;"
+
+[[exercise]]
+id = "0.2"
+lesson = 0
+title = "Filtern mit WHERE"
+db = "flat"
+task = "Finde alle Datensätze der Linie `S1`, bei denen die Verspätung (`delay_min`) mindestens 10 Minuten beträgt. Gib `stop`, `scheduled` und `delay_min` aus."
+hint = "WHERE line = 'S1' AND delay_min >= 10"
+solution = "SELECT stop, scheduled, delay_min FROM delays WHERE line = 'S1' AND delay_min >= 10;"
+
+[[exercise]]
+id = "0.3"
+lesson = 0
+title = "Sortieren und Begrenzen"
+db = "flat"
+task = "Die fünf größten Verspätungen: `line`, `stop`, `delay_min`, absteigend nach Verspätung, bei Gleichstand nach `id` aufsteigend."
+hint = "ORDER BY ... DESC, ... LIMIT 5"
+ordered = true
+solution = "SELECT line, stop, delay_min FROM delays ORDER BY delay_min DESC, id ASC LIMIT 5;"
+
+[[exercise]]
+id = "0.4"
+lesson = 0
+title = "Suchen mit LIKE"
+db = "flat"
+task = "Alle verschiedenen Haltestellen, deren Name `Tor` enthält."
+hint = "LIKE '%Tor%'"
+solution = "SELECT DISTINCT stop FROM delays WHERE stop LIKE '%Tor%';"
+
+[[exercise]]
+id = "0.5"
+lesson = 0
+title = "Aggregieren"
+db = "flat"
+task = "Wie viele Fahrgäste sind insgesamt eingestiegen (`boarded`)? Eine Zeile, eine Spalte."
+hint = "SUM(...)"
+solution = "SELECT SUM(boarded) FROM delays;"
+
+[[exercise]]
+id = "0.6"
+lesson = 0
+title = "Gruppieren"
+db = "flat"
+task = "Durchschnittliche Verspätung je Verkehrsmittel (`mode`), gerundet auf eine Nachkommastelle. Spalten: `mode`, Durchschnitt."
+hint = "GROUP BY mode, ROUND(AVG(delay_min), 1)"
+solution = "SELECT mode, ROUND(AVG(delay_min), 1) FROM delays GROUP BY mode;"
+
+[[exercise]]
+id = "0.7"
+lesson = 0
+title = "Gruppen filtern"
+db = "flat"
+task = "Welche Haltestellen haben im Schnitt mehr als 3 Minuten Verspätung? Spalten: `stop`, Durchschnitt (ungerundet). Sortiert nach Durchschnitt absteigend."
+hint = "HAVING filtert nach dem Gruppieren, WHERE davor."
+ordered = true
+solution = "SELECT stop, AVG(delay_min) AS avg_delay FROM delays GROUP BY stop HAVING AVG(delay_min) > 3 ORDER BY avg_delay DESC;"
+
+[[exercise]]
+id = "0.8"
+lesson = 0
+title = "Wetter-Effekt"
+db = "flat"
+task = "Durchschnittliche Verspätung je Wetter (`weather`), gerundet auf eine Nachkommastelle, sortiert nach Durchschnitt absteigend. Wirkt sich Schnee aus?"
+hint = "Wie 0.6, nur mit anderer Gruppierung."
+ordered = true
+solution = "SELECT weather, ROUND(AVG(delay_min), 1) AS avg_delay FROM delays GROUP BY weather ORDER BY avg_delay DESC;"
