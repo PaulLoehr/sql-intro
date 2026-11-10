@@ -1,11 +1,11 @@
 [project]
 name = "sqlkurs"
 version = "0.1.0"
-description = "Interactive SQL introduction for HKA, modeled on CS50 SQL lectures 0 and 1"
+description = "Interactive SQL introduction for HKA: two 90-minute exercise sheets"
 authors = [
     { name = "Simon, Paul - D0413326", email = "paul.simon@dm.de" }
 ]
-requires-python = ">=3.13"
+requires-python = ">=3.11"
 dependencies = [
     "pydantic>=2.14.3",
 ]

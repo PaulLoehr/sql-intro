@@ -1,0 +1,379 @@
+# Übung 1: Daten verknüpfen. Datenbank: normalisiertes `kvv`.
+
+number = 1
+title = "Daten verknüpfen"
+db = "kvv"
+goal = "Die Daten aus Übung 0 liegen jetzt auf fünf Tabellen verteilt. Du lernst, Tabellen über Schlüssel zu verbinden (Subquery, `JOIN`, `LEFT JOIN`) und über mehrere Tabellen hinweg auszuwerten."
+
+# ---------------------------------------------------------------- 1 Tabellen und Schlüssel
+
+[[exercise]]
+id = "1.1"
+section = "Tabellen und Schlüssel"
+title = "Linien"
+task = "Zeige alle Zeilen und alle Spalten der Tabelle `lines`. Welche Spalte ist der Primärschlüssel?"
+hint = "`SELECT *` und der Tabellenname. Der Primärschlüssel ist die Spalte, die jede Zeile eindeutig benennt."
+solution = "SELECT * FROM lines;"
+
+[[exercise]]
+id = "1.2"
+section = "Tabellen und Schlüssel"
+title = "Barrierefreie Haltestellen je Zone"
+task = "Wie viele barrierefreie Haltestellen (`wheelchair = 1`) gibt es je Zone? Spalten (2): `zone`, `stops_count`. Sortiert nach `zone`."
+hint = "Tabelle `stops`: filtern mit `WHERE`, dann `GROUP BY`."
+ordered = true
+solution = """
+SELECT zone, COUNT(*) AS stops_count
+FROM stops
+WHERE wheelchair = 1
+GROUP BY zone
+ORDER BY zone;
+"""
+
+[[exercise]]
+id = "1.3"
+section = "Tabellen und Schlüssel"
+title = "Halte je Linie, nur mit Nummern"
+task = "Wie viele Haltestellen hat jede Linie? Werte nur `line_stops` aus. Spalten (2): `line_id`, `stops_count`. Sortiert nach `line_id`. Dir fällt auf: Du siehst nur Nummern, keine Linienamen. Welche Spalten in `line_stops` sind Fremdschlüssel?"
+hint = "Tabelle `line_stops`: `GROUP BY line_id`."
+ordered = true
+solution = """
+SELECT line_id, COUNT(*) AS stops_count
+FROM line_stops
+GROUP BY line_id
+ORDER BY line_id;
+"""
+
+[[exercise]]
+id = "1.4"
+section = "Tabellen und Schlüssel"
+title = "Kennzahlen der Halte"
+task = "Fasse die Tabelle `stop_events` in einer Zeile zusammen. Spalten (4): `events_count` (Anzahl Halte), `avg_delay` (durchschnittliche `delay_min`, auf 2 Nachkommastellen gerundet), `max_delay` (größte `delay_min`), `total_boarded` (Summe `boarded`)."
+hint = "Aggregatfunktionen `COUNT`, `AVG`, `MAX`, `SUM`; `ROUND(..., 2)` für die Rundung."
+solution = """
+SELECT COUNT(*) AS events_count,
+       ROUND(AVG(delay_min), 2) AS avg_delay,
+       MAX(delay_min) AS max_delay,
+       SUM(boarded) AS total_boarded
+FROM stop_events;
+"""
+
+# ---------------------------------------------------------------- 2 Subquery
+
+[[exercise]]
+id = "1.5"
+section = "Subquery"
+title = "Erst die ID, dann filtern"
+task = "Zeige die Einträge der Linie `3` in `line_stops`. Spalten (2): `stop_id`, `position`. Sortiert nach `position`. Du darfst die `id` der Linie nicht abtippen, sondern holst sie mit einer Subquery aus `lines`."
+hint = "`WHERE line_id = (SELECT ... FROM lines WHERE ...)`"
+ordered = true
+solution = """
+SELECT stop_id, position
+FROM line_stops
+WHERE line_id = (SELECT id FROM lines WHERE name = '3')
+ORDER BY position;
+"""
+
+[[exercise]]
+id = "1.6"
+section = "Subquery"
+title = "Dieselbe Zone wie der Hauptbahnhof"
+task = "Welche Haltestellen liegen in derselben Zone wie `Hauptbahnhof`? Spalte (1): `name`, alphabetisch. Der Hauptbahnhof selbst ist mit dabei. Die Zone des Hauptbahnhofs holst du per Subquery."
+hint = "Tabelle `stops`. Die Subquery liefert genau einen Wert (die Zone); vergleiche mit `=`."
+ordered = true
+solution = """
+SELECT name
+FROM stops
+WHERE zone = (SELECT zone FROM stops WHERE name = 'Hauptbahnhof')
+ORDER BY name;
+"""
+
+[[exercise]]
+id = "1.7"
+section = "Subquery"
+title = "Haltestellen der Linie 3"
+task = "Welche Haltestellen bedient die Linie `3`? Spalte (1): `name`, alphabetisch. Löse es nur mit Subqueries (kein `JOIN`): erst die Linie, dann `line_stops`, dann `stops`."
+hint = "Zwei verschachtelte Subqueries. Eine Subquery mit mehreren Ergebnissen verlangt `IN` statt `=`."
+ordered = true
+solution = """
+SELECT name
+FROM stops
+WHERE id IN (
+    SELECT stop_id FROM line_stops
+    WHERE line_id = (SELECT id FROM lines WHERE name = '3')
+)
+ORDER BY name;
+"""
+
+[[exercise]]
+id = "1.8"
+section = "Subquery"
+title = "Überdurchschnittlich verspätet"
+bonus = true
+task = "Bei wie vielen Halten in `stop_events` war die Verspätung (`delay_min`) größer als der Durchschnitt aller Halte? Spalte (1): `delayed_count`."
+hint = "Die Subquery berechnet den Durchschnitt (ein einzelner Wert), die äußere Abfrage zählt."
+solution = """
+SELECT COUNT(*) AS delayed_count
+FROM stop_events
+WHERE delay_min > (SELECT AVG(delay_min) FROM stop_events);
+"""
+
+# ---------------------------------------------------------------- 3 JOIN
+
+[[exercise]]
+id = "1.9"
+section = "JOIN"
+title = "Fahrten mit Linienname"
+task = "Zeige alle Fahrten bei Schnee (`weather = 'snow'`) mit dem Namen ihrer Linie. Spalten (3): `trip_id` (die `id` aus `trips`), `line_name` (Name aus `lines`), `direction`. Sortiert nach `trip_id`."
+hint = "`trips JOIN lines ON ...`: Verbinde den Fremdschlüssel in `trips` mit dem Primärschlüssel in `lines`. `name` und `id` gibt es in mehreren Tabellen: qualifiziere sie."
+ordered = true
+solution = """
+SELECT trips.id AS trip_id, lines.name AS line_name, trips.direction
+FROM trips
+JOIN lines ON lines.id = trips.line_id
+WHERE trips.weather = 'snow'
+ORDER BY trips.id;
+"""
+
+[[exercise]]
+id = "1.10"
+section = "JOIN"
+title = "Linie 3 in Fahrtreihenfolge"
+task = "Dasselbe wie 1.7, aber mit `JOIN`, und mit der Reihenfolge der Fahrt. Linie `3`, Spalten (2): `position`, `name` (der Haltestelle). Sortiert nach `position`."
+hint = "Drei Tabellen: `lines`, `line_stops`, `stops`. `line_stops` ist die Brücke in der Mitte."
+ordered = true
+solution = """
+SELECT line_stops.position, stops.name
+FROM lines
+JOIN line_stops ON line_stops.line_id = lines.id
+JOIN stops ON stops.id = line_stops.stop_id
+WHERE lines.name = '3'
+ORDER BY line_stops.position;
+"""
+
+[[exercise]]
+id = "1.11"
+section = "JOIN"
+title = "Zone 4 mit Aliasen"
+task = "Welche Linie bedient welche Haltestelle in Zone 4? Spalten (2): `stop_name`, `line_name`. Sortiert nach `stop_name`, bei Gleichstand nach `line_name`. Kürze die Tabellennamen mit Aliasen ab (z. B. `lines AS l`)."
+hint = "Wieder `lines`, `line_stops`, `stops`. Alias hinter dem Tabellennamen, danach überall `l.name` statt `lines.name`; Spaltennamen im Ergebnis mit `AS` setzen."
+ordered = true
+solution = """
+SELECT s.name AS stop_name, l.name AS line_name
+FROM stops AS s
+JOIN line_stops AS ls ON ls.stop_id = s.id
+JOIN lines AS l ON l.id = ls.line_id
+WHERE s.zone = 4
+ORDER BY stop_name, line_name;
+"""
+
+[[exercise]]
+id = "1.12"
+section = "JOIN"
+title = "Die schlimmsten Verspätungen"
+bonus = true
+task = "Zeige alle Halte mit mindestens 10 Minuten Verspätung. Spalten (4): `stop_name`, `line_name`, `scheduled`, `delay_min`. Sortiert nach `delay_min` absteigend, bei Gleichstand nach `scheduled`."
+hint = "Vier Tabellen: `stop_events` -> `stops` und `stop_events` -> `trips` -> `lines`."
+ordered = true
+solution = """
+SELECT s.name AS stop_name, l.name AS line_name, e.scheduled, e.delay_min
+FROM stop_events AS e
+JOIN stops AS s ON s.id = e.stop_id
+JOIN trips AS t ON t.id = e.trip_id
+JOIN lines AS l ON l.id = t.line_id
+WHERE e.delay_min >= 10
+ORDER BY e.delay_min DESC, e.scheduled;
+"""
+
+# ---------------------------------------------------------------- 4 Joins und Aggregation
+
+[[exercise]]
+id = "1.13"
+section = "Joins und Aggregation"
+title = "Knotenpunkte"
+task = "Welche Haltestellen werden von mehr als einer Linie bedient? Spalten (2): `name` (der Haltestelle), `lines_count` (Anzahl der Linien). Sortiert nach `lines_count` absteigend, bei Gleichstand nach `name`."
+hint = "`stops JOIN line_stops`, dann `GROUP BY` und `HAVING COUNT(*) > 1`."
+ordered = true
+solution = """
+SELECT stops.name, COUNT(*) AS lines_count
+FROM stops
+JOIN line_stops ON line_stops.stop_id = stops.id
+GROUP BY stops.id
+HAVING COUNT(*) > 1
+ORDER BY lines_count DESC, stops.name;
+"""
+
+[[exercise]]
+id = "1.14"
+section = "Joins und Aggregation"
+title = "Verspätung je Linie"
+task = "Durchschnittliche Verspätung je Linie. Spalten (2): `line_name`, `avg_delay` (auf 2 Nachkommastellen gerundet). Schlechteste Linie zuerst, bei Gleichstand nach `line_name`."
+hint = "Der Weg führt über `stop_events` -> `trips` -> `lines`. Gruppiere nach der Linie."
+ordered = true
+solution = """
+SELECT lines.name AS line_name, ROUND(AVG(stop_events.delay_min), 2) AS avg_delay
+FROM stop_events
+JOIN trips ON trips.id = stop_events.trip_id
+JOIN lines ON lines.id = trips.line_id
+GROUP BY lines.id
+ORDER BY avg_delay DESC, line_name;
+"""
+
+[[exercise]]
+id = "1.15"
+section = "Joins und Aggregation"
+title = "Verspätung je Zone"
+task = "Durchschnittliche Verspätung je Zone der Haltestelle. Spalten (3): `zone`, `events_count` (Anzahl Halte), `avg_delay` (auf 2 Nachkommastellen gerundet). Sortiert nach `zone`."
+hint = "`stop_events` und `stops` verbinden, `GROUP BY` auf die Zone."
+ordered = true
+solution = """
+SELECT stops.zone, COUNT(*) AS events_count, ROUND(AVG(stop_events.delay_min), 2) AS avg_delay
+FROM stop_events
+JOIN stops ON stops.id = stop_events.stop_id
+GROUP BY stops.zone
+ORDER BY stops.zone;
+"""
+
+[[exercise]]
+id = "1.16"
+section = "Joins und Aggregation"
+title = "Verkehrsmittel mit Problemen"
+bonus = true
+task = "Welche Verkehrsmittel (`mode` in `lines`) haben eine durchschnittliche Verspätung von mehr als 3 Minuten? Spalten (3): `mode`, `events_count`, `avg_delay` (auf 2 Nachkommastellen gerundet). Schlechteste zuerst."
+hint = "Filter auf eine Gruppe nach dem Gruppieren: `HAVING AVG(...) > 3`. Verwende dabei den ungerundeten Wert."
+ordered = true
+solution = """
+SELECT lines.mode, COUNT(*) AS events_count, ROUND(AVG(stop_events.delay_min), 2) AS avg_delay
+FROM stop_events
+JOIN trips ON trips.id = stop_events.trip_id
+JOIN lines ON lines.id = trips.line_id
+GROUP BY lines.mode
+HAVING AVG(stop_events.delay_min) > 3
+ORDER BY avg_delay DESC;
+"""
+
+# ---------------------------------------------------------------- 5 LEFT JOIN und NULL
+
+[[exercise]]
+id = "1.17"
+section = "LEFT JOIN und NULL"
+title = "Haltestelle ohne Linie"
+task = "Welche Haltestellen werden von keiner Linie bedient? Spalten (2): `name`, `zone`. Mit `JOIN` fällt so eine Haltestelle weg. Mit `LEFT JOIN` bleibt sie erhalten, und die Spalten der anderen Tabelle sind `NULL`."
+hint = "`stops LEFT JOIN line_stops ON ...`, dann `WHERE line_stops.stop_id IS NULL`."
+solution = """
+SELECT stops.name, stops.zone
+FROM stops
+LEFT JOIN line_stops ON line_stops.stop_id = stops.id
+WHERE line_stops.stop_id IS NULL;
+"""
+
+[[exercise]]
+id = "1.18"
+section = "LEFT JOIN und NULL"
+title = "Die am seltensten bedienten Haltestellen"
+task = "Die fünf Haltestellen mit den wenigsten Halten in `stop_events`, auch solche mit 0. Spalten (2): `name`, `events_count`. Aufsteigend nach `events_count`, bei Gleichstand nach `name`."
+hint = "`LEFT JOIN`, damit Haltestellen ohne Halte nicht wegfallen. Zähle eine Spalte der rechten Tabelle (`COUNT(stop_events.id)`), denn `COUNT(*)` zählt auch die Zeile mit `NULL` als 1."
+ordered = true
+solution = """
+SELECT stops.name, COUNT(stop_events.id) AS events_count
+FROM stops
+LEFT JOIN stop_events ON stop_events.stop_id = stops.id
+GROUP BY stops.id
+ORDER BY events_count, stops.name
+LIMIT 5;
+"""
+
+[[exercise]]
+id = "1.19"
+section = "LEFT JOIN und NULL"
+title = "Kaum Verkehr bei Schnee"
+task = "Welche Haltestellen hatten bei Schnee (`trips.weather = 'snow'`) weniger als 3 Halte, auch solche mit 0? Spalten (2): `name`, `snow_events`. Aufsteigend nach `snow_events`, bei Gleichstand nach `name`."
+hint = "`stops` -> `stop_events` -> `trips`, beide per `LEFT JOIN`. Die Bedingung `weather = 'snow'` gehört in das `ON` des letzten Joins, nicht in `WHERE` (sonst verschwindet die Haltestelle ohne Halte wieder). Zähle `COUNT(trips.id)`."
+ordered = true
+solution = """
+SELECT stops.name, COUNT(trips.id) AS snow_events
+FROM stops
+LEFT JOIN stop_events ON stop_events.stop_id = stops.id
+LEFT JOIN trips ON trips.id = stop_events.trip_id AND trips.weather = 'snow'
+GROUP BY stops.id
+HAVING COUNT(trips.id) < 3
+ORDER BY snow_events, stops.name;
+"""
+
+# ---------------------------------------------------------------- 6 Fragen an das Netz
+
+[[exercise]]
+id = "1.20"
+section = "Fragen an das Netz"
+title = "Wetter und Verkehrsmittel"
+task = "Wie wirkt sich das Wetter auf die einzelnen Verkehrsmittel aus? Durchschnittliche Verspätung je Wetter und Verkehrsmittel. Spalten (3): `weather` (aus `trips`), `mode` (aus `lines`), `avg_delay` (auf 2 Nachkommastellen gerundet). Sortiert nach `weather`, dann `mode`."
+hint = "`trips`, `lines` und `stop_events` verbinden, nach zwei Spalten gruppieren."
+ordered = true
+solution = """
+SELECT trips.weather, lines.mode, ROUND(AVG(stop_events.delay_min), 2) AS avg_delay
+FROM trips
+JOIN lines ON lines.id = trips.line_id
+JOIN stop_events ON stop_events.trip_id = trips.id
+GROUP BY trips.weather, lines.mode
+ORDER BY trips.weather, lines.mode;
+"""
+
+[[exercise]]
+id = "1.21"
+section = "Fragen an das Netz"
+title = "Auslastung in Zone 1"
+task = "Welche Linien sind in Zone 1 am vollsten? Durchschnittliche Einsteiger (`boarded`) je Halt, nur Halte an Haltestellen der Zone 1, je Linie. Spalten (2): `line_name`, `avg_boarded` (auf 1 Nachkommastelle gerundet). Höchster Wert zuerst, bei Gleichstand nach `line_name`."
+hint = "Vier Tabellen: `stop_events` -> `stops` (für die Zone) und `stop_events` -> `trips` -> `lines` (für die Linie). Linien ohne Halt in Zone 1 erscheinen nicht."
+ordered = true
+solution = """
+SELECT lines.name AS line_name, ROUND(AVG(stop_events.boarded), 1) AS avg_boarded
+FROM stop_events
+JOIN stops ON stops.id = stop_events.stop_id
+JOIN trips ON trips.id = stop_events.trip_id
+JOIN lines ON lines.id = trips.line_id
+WHERE stops.zone = 1
+GROUP BY lines.id
+ORDER BY avg_boarded DESC, line_name;
+"""
+
+[[exercise]]
+id = "1.22"
+section = "Fragen an das Netz"
+title = "Verspätung in der Hauptverkehrszeit"
+task = "Wie schlecht ist es zur Hauptverkehrszeit? Als Hauptverkehrszeit gelten Halte mit planmäßiger Uhrzeit (`scheduled`) in den Stunden 7, 8, 16 und 17. Durchschnittliche Verspätung dieser Halte je Linie. Spalten (3): `line_name`, `events_count`, `avg_delay` (auf 2 Nachkommastellen gerundet). Schlechteste Linie zuerst, bei Gleichstand nach `line_name`."
+hint = "Die Stunde steckt in `scheduled` (Text `YYYY-MM-DD HH:MM`): `CAST(strftime('%H', scheduled) AS INTEGER) IN (7, 8, 16, 17)`."
+ordered = true
+solution = """
+SELECT lines.name AS line_name,
+       COUNT(*) AS events_count,
+       ROUND(AVG(stop_events.delay_min), 2) AS avg_delay
+FROM stop_events
+JOIN trips ON trips.id = stop_events.trip_id
+JOIN lines ON lines.id = trips.line_id
+WHERE CAST(strftime('%H', stop_events.scheduled) AS INTEGER) IN (7, 8, 16, 17)
+GROUP BY lines.id
+ORDER BY avg_delay DESC, line_name;
+"""
+
+[[exercise]]
+id = "1.23"
+section = "Fragen an das Netz"
+title = "Die drei Problemstellen"
+bonus = true
+task = "Welche Kombinationen aus Linie und Haltestelle haben die höchste durchschnittliche Verspätung? Berücksichtige nur Kombinationen mit mindestens 10 Halten und zeige die drei schlechtesten. Spalten (4): `line_name`, `stop_name`, `events_count`, `avg_delay` (auf 2 Nachkommastellen gerundet). Schlechtester zuerst, bei Gleichstand nach `line_name`, dann `stop_name`."
+hint = "Nach zwei Spalten gruppieren (Linie und Haltestelle), `HAVING COUNT(*) >= 10`, `LIMIT 3`."
+ordered = true
+solution = """
+SELECT lines.name AS line_name,
+       stops.name AS stop_name,
+       COUNT(*) AS events_count,
+       ROUND(AVG(stop_events.delay_min), 2) AS avg_delay
+FROM stop_events
+JOIN stops ON stops.id = stop_events.stop_id
+JOIN trips ON trips.id = stop_events.trip_id
+JOIN lines ON lines.id = trips.line_id
+GROUP BY lines.id, stops.id
+HAVING COUNT(*) >= 10
+ORDER BY avg_delay DESC, line_name, stop_name
+LIMIT 3;
+"""

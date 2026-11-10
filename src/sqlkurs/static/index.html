@@ -5,99 +5,399 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SQL-Einführung</title>
 <style>
-  :root { --bg:#fff; --fg:#1d2330; --muted:#667085; --line:#d9dee7; --panel:#f5f7fa; --accent:#0b5fff; --ok:#12805c; --bad:#c0392b; }
-  @media (prefers-color-scheme: dark) { :root { --bg:#12151c; --fg:#e8ebf1; --muted:#9aa3b2; --line:#2b3140; --panel:#1a1f2a; --accent:#6b9bff; --ok:#43c59e; --bad:#ff7b6b; } }
+  :root {
+    --indigo: #49439B;
+    --indigo-deep: #1C1766;
+    --mint: #55C1AF;
+    --sky: #4AB7D3;
+    --violet: #8D67E3;
+    --violet-deep: #572EB6;
+    --text: #3E3E48;
+    --white: #FFFFFF;
+    --ok: #52AF00;
+    --warn: #F9A825;
+    --bad: #D8241C;
+    --surface: #F4F3FA;
+    --surface-2: color-mix(in srgb, var(--indigo) 12%, white);
+    --border: color-mix(in srgb, var(--indigo) 22%, white);
+    --muted: color-mix(in srgb, var(--text) 78%, white);
+    --ok-bg: color-mix(in srgb, var(--ok) 12%, white);
+    --bad-bg: color-mix(in srgb, var(--bad) 8%, white);
+    --warn-bg: color-mix(in srgb, var(--warn) 16%, white);
+    --ok-text: color-mix(in srgb, var(--ok) 45%, black);
+    --bad-text: color-mix(in srgb, var(--bad) 80%, black);
+    --warn-text: color-mix(in srgb, var(--warn) 40%, black);
+    --radius: 8px;
+    --font: "DM Office", Arial, sans-serif;
+    --mono: ui-monospace, Menlo, Consolas, monospace;
+  }
   * { box-sizing: border-box; }
-  body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.45 system-ui,sans-serif; display:grid; grid-template-columns:300px 1fr; height:100vh; }
-  aside { border-right:1px solid var(--line); overflow:auto; padding:12px; background:var(--panel); }
-  main { overflow:auto; padding:16px 20px; }
-  h1 { font-size:18px; margin:0 0 8px; } h2 { font-size:15px; margin:14px 0 6px; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; }
-  .ex { display:block; width:100%; text-align:left; border:0; background:none; color:inherit; padding:6px 8px; border-radius:6px; cursor:pointer; font:inherit; }
-  .ex:hover, .ex.active { background:var(--line); } .ex .done::before { content:"✓ "; color:var(--ok); }
-  textarea { width:100%; height:150px; font:15px/1.4 ui-monospace,Menlo,monospace; background:var(--panel); color:var(--fg); border:1px solid var(--line); border-radius:8px; padding:10px; resize:vertical; }
-  button.act { background:var(--accent); color:#fff; border:0; border-radius:8px; padding:8px 14px; font:inherit; cursor:pointer; margin:8px 8px 8px 0; }
-  button.sec { background:none; color:var(--accent); border:1px solid var(--line); }
-  table { border-collapse:collapse; margin-top:8px; font-size:14px; } th, td { border:1px solid var(--line); padding:4px 10px; text-align:left; } th { background:var(--panel); }
-  .msg { margin:8px 0; font-weight:600; } .ok { color:var(--ok); } .bad { color:var(--bad); } .muted { color:var(--muted); font-weight:400; }
-  details { margin:6px 0; } code { background:var(--panel); padding:1px 5px; border-radius:4px; } pre { background:var(--panel); padding:10px; border-radius:8px; overflow:auto; }
-  .schema { font-size:13px; } .schema b { display:block; margin-top:6px; } .schema span { color:var(--muted); }
-  @media (max-width: 800px) { body { grid-template-columns:1fr; height:auto; } aside { border-right:0; border-bottom:1px solid var(--line); } }
+  html { font-size: 17px; }
+  body {
+    margin: 0; background: var(--white); color: var(--text);
+    font-family: var(--font); line-height: 1.5;
+    min-height: 100vh; display: flex; flex-direction: column;
+  }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  :focus-visible { outline: 3px solid var(--mint); outline-offset: 2px; }
+  code { font-family: var(--mono); font-size: 0.92em; background: var(--surface-2); color: var(--indigo-deep); padding: 1px 6px; border-radius: 4px; }
+  h1, h2, h3 { margin: 0; color: var(--indigo); line-height: 1.25; }
+
+  header {
+    background: var(--indigo); color: var(--white);
+    display: flex; flex-wrap: wrap; align-items: center; gap: 8px 24px;
+    padding: 8px 24px;
+  }
+  header .brand { color: var(--white); font-size: 1.2rem; font-weight: 700; margin-right: 8px; }
+  .tabs { display: flex; gap: 8px; flex: 1; flex-wrap: wrap; }
+  .tab {
+    background: transparent; color: var(--white); border: 1px solid transparent;
+    border-radius: var(--radius); padding: 8px 16px; font-weight: 600;
+  }
+  .tab:hover { background: var(--indigo-deep); }
+  .tab[aria-selected="true"] { background: var(--white); color: var(--indigo-deep); }
+  .progress { font-weight: 600; white-space: nowrap; }
+
+  .layout { display: grid; grid-template-columns: 300px 1fr; flex: 1; min-height: 0; }
+  nav { background: var(--surface); padding: 24px 16px; overflow-y: auto; }
+  nav h2 { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--indigo-deep); margin: 24px 8px 8px; }
+  nav h2:first-child { margin-top: 0; }
+  .nav-item {
+    display: flex; align-items: baseline; gap: 8px; width: 100%; text-align: left;
+    background: transparent; border: 0; border-radius: var(--radius); padding: 8px;
+  }
+  .nav-item:hover { background: var(--surface-2); }
+  .nav-item[aria-current="true"] { background: var(--indigo); color: var(--white); }
+  .nav-item .num { font-weight: 700; min-width: 2.2em; }
+  .nav-item .label { flex: 1; }
+  .badge { font-size: 0.78rem; font-weight: 700; border-radius: 999px; padding: 0 8px; white-space: nowrap; }
+  .badge.done { background: var(--ok-bg); color: var(--ok-text); }
+  .badge.open { color: var(--muted); font-weight: 400; }
+  .badge.bonus { background: var(--white); color: var(--violet-deep); border: 1px solid var(--violet); }
+  .nav-item[aria-current="true"] .badge.open { color: var(--white); }
+
+  main { padding: 24px 32px 48px; min-width: 0; }
+  .work { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 24px; align-items: start; }
+  .col { min-width: 0; display: flex; flex-direction: column; gap: 16px; }
+
+  .card { background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 24px; }
+  .card h1 { font-size: 1.5rem; margin-bottom: 8px; }
+  .card .meta { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 8px; color: var(--muted); font-weight: 600; }
+  .card p { margin: 0 0 8px; }
+  .notice { display: inline-block; background: var(--surface-2); color: var(--indigo-deep); border-radius: var(--radius); padding: 4px 12px; font-weight: 600; margin-top: 8px; }
+  details { margin-top: 16px; }
+  summary { cursor: pointer; color: var(--indigo); font-weight: 600; padding: 4px 0; }
+  details > div { margin-top: 8px; padding: 16px; background: var(--surface); border-radius: var(--radius); }
+
+  .start p { max-width: 60ch; }
+  .start .goal-label { color: var(--indigo-deep); font-weight: 700; margin-top: 16px; }
+
+  textarea {
+    width: 100%; min-height: 168px; resize: vertical;
+    font-family: var(--mono); font-size: 1rem; line-height: 1.5; tab-size: 4;
+    color: var(--text); background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius); padding: 16px;
+  }
+  textarea:focus-visible { outline: 3px solid var(--mint); outline-offset: 0; border-color: var(--indigo); }
+  .editor-label { display: block; font-weight: 600; color: var(--indigo-deep); margin-bottom: 8px; }
+  .hintline { color: var(--muted); font-size: 0.85rem; margin-top: 4px; }
+
+  .buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+  .btn { border-radius: var(--radius); padding: 8px 20px; font-weight: 600; border: 2px solid var(--indigo); background: var(--white); color: var(--indigo); }
+  .btn:hover:not(:disabled) { background: var(--surface-2); color: var(--indigo-deep); border-color: var(--indigo-deep); }
+  .btn.primary { background: var(--indigo); color: var(--white); }
+  .btn.primary:hover:not(:disabled) { background: var(--indigo-deep); color: var(--white); }
+  .btn.success { background: var(--mint); border-color: var(--mint); color: var(--indigo-deep); }
+  .btn.success:hover:not(:disabled) { background: var(--indigo-deep); border-color: var(--indigo-deep); color: var(--white); }
+  .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+  .btn.small { padding: 4px 16px; font-size: 0.9rem; }
+
+  #messages { margin-top: 16px; }
+  .msg { border-radius: var(--radius); padding: 12px 16px; font-weight: 600; margin-bottom: 8px; border: 1px solid; }
+  .msg.ok { background: var(--ok-bg); color: var(--ok-text); border-color: var(--ok); }
+  .msg.bad { background: var(--bad-bg); color: var(--bad-text); border-color: var(--bad); white-space: pre-wrap; font-family: var(--mono); font-size: 0.95rem; font-weight: 400; }
+  .msg.bad.plain { font-family: var(--font); font-weight: 600; font-size: inherit; }
+  .msg.info { background: var(--surface); color: var(--text); border-color: var(--border); font-weight: 400; }
+  .solution { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin: 0 0 8px; }
+  .solution .cap { font-weight: 700; color: var(--indigo-deep); margin-bottom: 8px; }
+  .solution pre { margin: 0; font-family: var(--mono); font-size: 0.95rem; white-space: pre-wrap; overflow-x: auto; }
+
+  .result { margin-top: 8px; }
+  .tablewrap { overflow: auto; max-height: 420px; border: 1px solid var(--border); border-radius: var(--radius); }
+  table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+  th, td { padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  th { position: sticky; top: 0; background: var(--surface-2); color: var(--indigo-deep); font-weight: 700; }
+  tbody tr:nth-child(even) td { background: var(--surface); }
+  td.null { color: var(--muted); font-style: italic; }
+  td.num { font-variant-numeric: tabular-nums; }
+  .rowinfo { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; color: var(--muted); font-size: 0.92rem; }
+  .trunc { background: var(--warn-bg); color: var(--warn-text); border: 1px solid var(--warn); border-radius: 999px; padding: 0 12px; font-weight: 600; }
+
+  aside.schema { background: var(--surface); border-radius: 12px; padding: 16px; }
+  aside.schema h2 { font-size: 1.05rem; margin-bottom: 16px; }
+  .tbl { margin-bottom: 16px; }
+  .tbl h3 { font-size: 0.95rem; font-family: var(--mono); color: var(--indigo-deep); margin-bottom: 4px; }
+  .tbl ul { list-style: none; margin: 0; padding: 0; font-size: 0.88rem; }
+  .tbl li { display: flex; justify-content: space-between; gap: 8px; padding: 2px 0; }
+  .tbl .cname { font-family: var(--mono); }
+  .tbl .ctype { color: var(--muted); font-size: 0.8rem; text-align: right; }
+  .pk { font-size: 0.7rem; font-weight: 700; background: var(--indigo); color: var(--white); border-radius: 4px; padding: 0 4px; margin-left: 4px; vertical-align: 1px; }
+
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+  @media (max-width: 1280px) {
+    .work { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (max-width: 900px) {
+    html { font-size: 16px; }
+    header { padding: 8px 16px; }
+    .layout { grid-template-columns: 1fr; }
+    nav { padding: 16px; max-height: 40vh; }
+    main { padding: 16px 16px 40px; }
+    .card { padding: 16px; }
+  }
 </style>
 </head>
 <body>
-<aside>
-  <h1>SQL-Einführung</h1>
-  <div id="list"></div>
-  <h2>Schema</h2>
-  <div id="schema" class="schema"></div>
-  <button class="act sec" id="reset">Datenbank zurücksetzen</button>
-</aside>
-<main>
-  <div id="title"><h1>Freie Abfrage</h1><p class="muted">Links eine Aufgabe wählen, oder hier frei ausprobieren.</p></div>
-  <div id="task"></div>
-  <textarea id="sql" spellcheck="false" placeholder="SELECT ..."></textarea>
-  <div>
-    <button class="act" id="run">Ausführen (Strg+Enter)</button>
-    <button class="act sec" id="check" hidden>Prüfen</button>
-    <button class="act sec" id="solution" hidden>Lösung zeigen</button>
-  </div>
-  <div id="out"></div>
-</main>
-<script>
-const $ = id => document.getElementById(id);
-let exercises = [], current = null, db = "flat";
-const done = new Set(JSON.parse(localStorage.getItem("done") || "[]"));
+<header>
+  <span class="brand">SQL-Einführung</span>
+  <div class="tabs" id="tabs" role="tablist" aria-label="Übungen"></div>
+  <div class="progress" id="progress"></div>
+</header>
+<div class="layout">
+  <nav id="nav" aria-label="Aufgaben"></nav>
+  <main id="main" aria-label="Aufgabenbereich"></main>
+</div>
+<div id="live" class="sr" aria-live="polite"></div>
 
-const esc = s => String(s).replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
-async function post(path, body) {
-  const r = await fetch(path, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body)});
+<script>
+"use strict";
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmt = (s) => esc(s).replace(/`([^`]+)`/g, "<code>$1</code>");
+
+const store = {
+  get(key, fallback) { try { const v = localStorage.getItem(key); return v === null ? fallback : JSON.parse(v); } catch (e) { return fallback; } },
+  set(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) { /* ignore */ } },
+};
+
+let sheets = [];
+let sheetIdx = 0;
+let currentId = null;
+const done = new Set(store.get("sqlkurs.done", []));
+const drafts = store.get("sqlkurs.drafts", {}) || {};
+const attempted = new Set();
+const passed = new Set();
+let schemaCache = {};
+
+async function api(path, body) {
+  const opts = body === undefined ? {} : { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) };
+  const r = await fetch(path, opts);
   return r.json();
 }
-function table(res) {
-  if (res.error) return `<div class="msg bad">${esc(res.error)}</div>`;
-  if (!res.columns.length) return `<div class="msg muted">OK, ${res.rowcount} Zeile(n) betroffen.</div>`;
-  const head = res.columns.map(c => `<th>${esc(c)}</th>`).join("");
-  const rows = res.rows.map(r => `<tr>${r.map(v => `<td>${v === null ? '<i class="muted">NULL</i>' : esc(v)}</td>`).join("")}</tr>`).join("");
-  return `<table><tr>${head}</tr>${rows}</table><div class="muted">${res.rows.length} Zeile(n)${res.truncated ? " (gekürzt)" : ""}</div>`;
+
+const allExercises = () => sheets.flatMap((s) => s.exercises);
+const sheetOf = (id) => sheets.findIndex((s) => s.exercises.some((e) => e.id === id));
+const exById = (id) => allExercises().find((e) => e.id === id);
+
+function announce(text) { $("live").textContent = ""; setTimeout(() => { $("live").textContent = text; }, 30); }
+
+function renderHeader() {
+  $("tabs").innerHTML = sheets.map((s, i) =>
+    `<button class="tab" role="tab" data-i="${i}" aria-selected="${i === sheetIdx}">Übung ${esc(s.number)}</button>`).join("");
+  $("tabs").querySelectorAll(".tab").forEach((b) => b.onclick = () => { sheetIdx = +b.dataset.i; currentId = null; renderAll(); });
+  const total = allExercises().length;
+  $("progress").textContent = `${done.size} / ${total} erledigt`;
 }
-async function loadSchema() {
-  const s = await (await fetch(`/api/schema/${db}`)).json();
-  $("schema").innerHTML = s.map(t => `<b>${esc(t.table)}</b><span>${t.columns.map(c => esc(c.name)).join(", ")}</span>`).join("");
-}
-function renderList() {
-  let html = "", lesson = null;
-  for (const e of exercises) {
-    if (e.lesson !== lesson) { lesson = e.lesson; html += `<h2>Lecture ${lesson}</h2>`; }
-    html += `<button class="ex ${current?.id === e.id ? "active" : ""}" data-id="${e.id}"><span class="${done.has(e.id) ? "done" : ""}">${e.id} ${esc(e.title)}</span></button>`;
+
+function renderNav() {
+  const sheet = sheets[sheetIdx];
+  let html = "", section = null;
+  for (const e of sheet.exercises) {
+    if (e.section !== section) { section = e.section; html += `<h2>${esc(section)}</h2>`; }
+    const isDone = done.has(e.id);
+    html += `<button class="nav-item" data-id="${esc(e.id)}"${e.id === currentId ? ' aria-current="true"' : ""}>` +
+      `<span class="num">${esc(e.id)}</span><span class="label">${esc(e.title)}</span>` +
+      (e.bonus ? `<span class="badge bonus">Zusatz</span>` : "") +
+      `<span class="badge ${isDone ? "done" : "open"}">${isDone ? "erledigt" : "offen"}</span></button>`;
   }
-  $("list").innerHTML = html;
-  document.querySelectorAll(".ex").forEach(b => b.onclick = () => select(b.dataset.id));
+  $("nav").innerHTML = html;
+  $("nav").querySelectorAll(".nav-item").forEach((b) => b.onclick = () => select(b.dataset.id));
 }
-async function select(id) {
-  current = exercises.find(e => e.id === id);
-  db = current.db;
-  $("title").innerHTML = `<h1>${esc(current.id)} ${esc(current.title)}</h1>`;
-  $("task").innerHTML = `<p>${esc(current.task).replace(/`([^`]+)`/g, "<code>$1</code>")}</p>` +
-    (current.hint ? `<details><summary>Tipp</summary>${esc(current.hint)}</details>` : "");
-  $("sql").value = ""; $("out").innerHTML = "";
-  $("check").hidden = $("solution").hidden = false;
-  renderList(); loadSchema();
+
+async function loadSchema(db) {
+  const box = $("schema-body");
+  if (!box) return;
+  try {
+    if (!schemaCache[db]) schemaCache[db] = await api(`/api/schema/${encodeURIComponent(db)}`);
+    const cur = $("schema-body");
+    if (!cur || cur.dataset.db !== db) return;
+    cur.innerHTML = schemaCache[db].map((t) =>
+      `<div class="tbl"><h3>${esc(t.table)}</h3><ul>` + t.columns.map((c) =>
+        `<li><span class="cname">${esc(c.name)}${c.pk ? '<span class="pk" title="Primärschlüssel">PK</span>' : ""}</span><span class="ctype">${esc(c.type || "")}</span></li>`).join("") +
+      `</ul></div>`).join("");
+  } catch (e) {
+    box.textContent = "Schema konnte nicht geladen werden.";
+  }
 }
-async function run() { $("out").innerHTML = table(await post("/api/run", {db, sql:$("sql").value})); }
+
+function schemaPanel(db) {
+  return `<aside class="schema" aria-label="Datenbankschema">
+    <h2>Datenbank</h2>
+    <div id="schema-body" data-db="${esc(db)}">Lade ...</div>
+    <button class="btn small" id="reset">Datenbank zurücksetzen</button>
+  </aside>`;
+}
+
+async function resetDb(db) {
+  try {
+    await api("/api/reset", { db: "" });
+    schemaCache = {};
+    showMessages(`<div class="msg info">Datenbank zurückgesetzt.</div>`);
+    announce("Datenbank zurückgesetzt");
+    loadSchema(db);
+  } catch (e) {
+    showMessages(`<div class="msg bad plain">Zurücksetzen fehlgeschlagen.</div>`);
+  }
+}
+
+function renderMain() {
+  const sheet = sheets[sheetIdx];
+  if (!currentId) return renderStart(sheet);
+  const e = exById(currentId);
+  const idx = sheet.exercises.findIndex((x) => x.id === e.id);
+  const hasNext = idx < sheet.exercises.length - 1;
+  $("main").innerHTML = `<div class="work"><div class="col">
+    <section class="card" aria-labelledby="task-title">
+      <div class="meta"><span>Aufgabe ${esc(e.id)}</span>${e.bonus ? '<span class="badge bonus">Zusatz</span>' : ""}<span>${esc(e.section)}</span></div>
+      <h1 id="task-title">${esc(e.title)}</h1>
+      <p>${fmt(e.task)}</p>
+      ${e.ordered ? '<div class="notice">Reihenfolge zählt</div>' : ""}
+      ${e.hint ? `<details><summary>Tipp</summary><div>${fmt(e.hint)}</div></details>` : ""}
+    </section>
+    <section aria-label="SQL-Editor">
+      <label class="editor-label" for="sql">Deine SQL-Abfrage</label>
+      <textarea id="sql" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="SELECT ..."></textarea>
+      <div class="hintline">Strg/Cmd + Enter führt aus. Tab rückt ein.</div>
+      <div class="buttons">
+        <button class="btn primary" id="run">Ausführen</button>
+        <button class="btn" id="check">Prüfen</button>
+        <button class="btn" id="solution" disabled title="Erst nach einem Prüfen-Versuch verfügbar">Lösung zeigen</button>
+        <button class="btn${passed.has(e.id) ? " success" : ""}" id="next"${hasNext ? "" : " disabled"}>Weiter</button>
+      </div>
+      <div id="messages" aria-live="polite"></div>
+    </section>
+  </div>${schemaPanel(sheet.db)}</div>`;
+  const ta = $("sql");
+  ta.value = drafts[e.id] || "";
+  ta.addEventListener("input", () => { drafts[e.id] = ta.value; store.set("sqlkurs.drafts", drafts); });
+  ta.addEventListener("keydown", (ev) => {
+    if (ev.key === "Tab" && !ev.shiftKey && !ev.ctrlKey && !ev.altKey && !ev.metaKey) {
+      ev.preventDefault();
+      const s = ta.selectionStart, en = ta.selectionEnd;
+      ta.value = ta.value.slice(0, s) + "    " + ta.value.slice(en);
+      ta.selectionStart = ta.selectionEnd = s + 4;
+      ta.dispatchEvent(new Event("input"));
+    } else if ((ev.ctrlKey || ev.metaKey) && ev.key === "Enter") {
+      ev.preventDefault(); run();
+    }
+  });
+  $("run").onclick = run;
+  $("check").onclick = check;
+  $("solution").onclick = showSolution;
+  $("next").onclick = () => { if (hasNext) select(sheet.exercises[idx + 1].id); };
+  $("reset").onclick = () => resetDb(sheet.db);
+  if (attempted.has(e.id)) $("solution").disabled = false;
+  loadSchema(sheet.db);
+}
+
+function renderStart(sheet) {
+  const first = sheet.exercises[0];
+  const db = sheet.db;
+  $("main").innerHTML = `<div class="work"><div class="col">
+    <section class="card start">
+      <div class="meta"><span>Übung ${esc(sheet.number)}</span></div>
+      <h1>${esc(sheet.title)}</h1>
+      <div class="goal-label">Ziel</div>
+      <p>${fmt(sheet.goal || "")}</p>
+      <div class="buttons"><button class="btn primary" id="start"${first ? "" : " disabled"}>Mit Aufgabe 1 starten</button></div>
+      <div id="messages" aria-live="polite"></div>
+    </section>
+  </div>${schemaPanel(db)}</div>`;
+  if (first) $("start").onclick = () => select(first.id);
+  $("reset").onclick = () => resetDb(db);
+  loadSchema(db);
+}
+
+function renderAll() { renderHeader(); renderNav(); renderMain(); }
+
+function select(id) {
+  currentId = id;
+  const si = sheetOf(id);
+  if (si >= 0) sheetIdx = si;
+  renderAll();
+  const t = $("task-title"); if (t) { t.setAttribute("tabindex", "-1"); t.focus({ preventScroll: true }); }
+  window.scrollTo(0, 0);
+}
+
+function cell(v) {
+  if (v === null || v === undefined) return `<td class="null">NULL</td>`;
+  return `<td${typeof v === "number" ? ' class="num"' : ""}>${esc(v)}</td>`;
+}
+function resultHtml(res) {
+  if (res.error) return `<div class="msg bad">${esc(res.error)}</div>`;
+  if (!res.columns || !res.columns.length) return `<div class="msg info">In Ordnung, ${res.rowcount} Zeile(n) betroffen.</div>`;
+  const head = res.columns.map((c) => `<th scope="col">${esc(c)}</th>`).join("");
+  const rows = res.rows.map((r) => `<tr>${r.map(cell).join("")}</tr>`).join("");
+  const n = res.rows.length;
+  return `<div class="result"><div class="tablewrap"><table><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table></div>
+    <div class="rowinfo"><span>${n} ${n === 1 ? "Zeile" : "Zeilen"}</span>${res.truncated ? '<span class="trunc">gekürzt</span>' : ""}</div></div>`;
+}
+function showMessages(html) { const m = $("messages"); if (m) m.innerHTML = html; }
+
+async function run() {
+  const e = exById(currentId); if (!e) return;
+  try {
+    const res = await api("/api/run", { db: sheets[sheetIdx].db, sql: $("sql").value });
+    showMessages(resultHtml(res));
+    announce(res.error ? "Fehler bei der Ausführung" : "Abfrage ausgeführt");
+  } catch (err) { showMessages(`<div class="msg bad plain">Server nicht erreichbar.</div>`); }
+}
+
 async function check() {
-  if (!current) return;
-  const r = await post("/api/check", {id:current.id, sql:$("sql").value});
-  if (r.ok) { done.add(current.id); localStorage.setItem("done", JSON.stringify([...done])); renderList(); }
-  $("out").innerHTML = `<div class="msg ${r.ok ? "ok" : "bad"}">${esc(r.message)}</div>` + (r.result ? table(r.result) : "");
+  const e = exById(currentId); if (!e) return;
+  try {
+    const r = await api("/api/check", { id: e.id, sql: $("sql").value });
+    attempted.add(e.id);
+    $("solution").disabled = false;
+    if (r.ok) {
+      done.add(e.id); passed.add(e.id); store.set("sqlkurs.done", [...done]);
+      renderHeader(); renderNav();
+      $("next").classList.add("success");
+    }
+    showMessages(`<div class="msg ${r.ok ? "ok" : "bad plain"}">${esc(r.message || (r.ok ? "Richtig." : "Nicht richtig."))}</div>` + (r.result ? resultHtml(r.result) : ""));
+    announce(r.message || (r.ok ? "Richtig" : "Nicht richtig"));
+  } catch (err) { showMessages(`<div class="msg bad plain">Server nicht erreichbar.</div>`); }
 }
-async function solution() {
-  const r = await (await fetch(`/api/solution/${current.id}`)).json();
-  $("out").innerHTML = `<pre>${esc(r.solution)}</pre>`;
+
+async function showSolution() {
+  const e = exById(currentId); if (!e) return;
+  try {
+    const r = await api(`/api/solution/${encodeURIComponent(e.id)}`);
+    showMessages(`<div class="solution"><div class="cap">Musterlösung</div><pre>${esc(r.solution || "")}</pre></div>`);
+  } catch (err) { showMessages(`<div class="msg bad plain">Lösung konnte nicht geladen werden.</div>`); }
 }
-$("run").onclick = run; $("check").onclick = check; $("solution").onclick = solution;
-$("reset").onclick = async () => { await post("/api/reset", {}); $("out").innerHTML = '<div class="msg muted">Zurückgesetzt.</div>'; loadSchema(); };
-$("sql").addEventListener("keydown", e => { if ((e.ctrlKey || e.metaKey) && e.key === "Enter") run(); });
-(async () => { exercises = await (await fetch("/api/exercises")).json(); renderList(); loadSchema(); })();
+
+(async () => {
+  try {
+    sheets = await api("/api/sheets");
+  } catch (e) {
+    $("main").innerHTML = `<div class="msg bad plain">Aufgaben konnten nicht geladen werden.</div>`;
+    return;
+  }
+  if (!sheets.length) { $("main").textContent = "Keine Übungen vorhanden."; return; }
+  renderAll();
+})();
 </script>
 </body>
 </html>

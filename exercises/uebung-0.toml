@@ -1,0 +1,241 @@
+# Übung 0: Abfragen auf einer Tabelle (90 Minuten). Datenbank: flat, Tabelle `delays`.
+# Spalten: id, line, mode, stop, zone, scheduled, weather, delay_min, boarded.
+
+number = 0
+title = "Abfragen auf einer Tabelle"
+db = "flat"
+goal = "Du stellst Fragen an eine einzelne Tabelle: Spalten wählen, Zeilen filtern und sortieren, zusammenfassen und gruppieren. Am Ende lässt du die Verspätungsdaten selbst erzählen, wann und warum es im Nahverkehr hakt."
+
+# ---------------------------------------------------------------------------
+# Abschnitt 1: Daten ansehen und Spalten wählen
+# ---------------------------------------------------------------------------
+
+[[exercise]]
+id = "0.1"
+section = "Daten ansehen"
+title = "Die ersten Zeilen"
+task = "Zeige alle Spalten der ersten 5 Zeilen der Tabelle `delays` (in der Reihenfolge, in der sie in der Tabelle stehen)."
+hint = "Ein Stern steht für alle Spalten. Mit `LIMIT` begrenzt du die Zeilenzahl."
+solution = "SELECT * FROM delays LIMIT 5;"
+
+[[exercise]]
+id = "0.2"
+section = "Daten ansehen"
+title = "Nur bestimmte Spalten"
+task = "Zeige die Spalten `line`, `stop` und `delay_min` (in dieser Reihenfolge) der ersten 10 Zeilen der Tabelle."
+hint = "Statt des Sterns zählst du die Spaltennamen auf, getrennt durch Kommas."
+solution = "SELECT line, stop, delay_min FROM delays LIMIT 10;"
+
+[[exercise]]
+id = "0.3"
+section = "Daten ansehen"
+title = "Eindeutige Kombinationen und Aliase"
+task = "Welche Kombinationen aus Linie und Verkehrsmittel gibt es? Jede Kombination soll nur einmal erscheinen. Gib die Spalten `line` und `mode` aus und nenne sie im Ergebnis `linie` und `verkehrsmittel`."
+hint = "`DISTINCT` steht direkt hinter `SELECT` und gilt für alle gewählten Spalten zusammen. Umbenennen geht mit `AS`."
+solution = "SELECT DISTINCT line AS linie, mode AS verkehrsmittel FROM delays;"
+
+# ---------------------------------------------------------------------------
+# Abschnitt 2: Filtern
+# ---------------------------------------------------------------------------
+
+[[exercise]]
+id = "0.4"
+section = "Filtern"
+title = "Große Verspätungen"
+task = "Finde alle Halte mit mindestens 8 Minuten Verspätung (`delay_min`). Gib `line`, `stop` und `delay_min` aus."
+hint = "Mit `WHERE` gibst du eine Bedingung an, die jede Zeile erfüllen muss. Vergleiche mit `>=`."
+solution = "SELECT line, stop, delay_min FROM delays WHERE delay_min >= 8;"
+
+[[exercise]]
+id = "0.5"
+section = "Filtern"
+title = "Bedingungen kombinieren"
+task = "Finde alle Halte der Straßenbahn (`mode` ist `tram`), die bei Schnee (`weather` ist `snow`) mindestens 5 Minuten Verspätung hatten. Gib `line`, `stop`, `weather` und `delay_min` aus."
+hint = "Text steht in einfachen Anführungszeichen. Mehrere Bedingungen verbindest du mit `AND`."
+solution = "SELECT line, stop, weather, delay_min FROM delays WHERE mode = 'tram' AND weather = 'snow' AND delay_min >= 5;"
+
+[[exercise]]
+id = "0.6"
+section = "Filtern"
+title = "IN, BETWEEN und NOT"
+task = "Finde alle Halte bei Regen oder Schnee (`weather` ist `rain` oder `snow`), die nicht in Zone 1 liegen und bei denen zwischen 50 und 80 Fahrgäste eingestiegen sind (beide Grenzen eingeschlossen). Gib `line`, `stop`, `zone`, `weather` und `boarded` aus."
+hint = "Für eine Liste von Werten gibt es `IN (...)`, für einen Bereich `BETWEEN ... AND ...`. Ungleich schreibst du `<>` oder mit `NOT`."
+solution = "SELECT line, stop, zone, weather, boarded FROM delays WHERE weather IN ('rain', 'snow') AND zone <> 1 AND boarded BETWEEN 50 AND 80;"
+
+# ---------------------------------------------------------------------------
+# Abschnitt 3: Textsuche
+# ---------------------------------------------------------------------------
+
+[[exercise]]
+id = "0.7"
+section = "Textsuche"
+title = "Text enthält"
+task = "Welche Haltestellen haben `platz` im Namen? Gib die Spalte `stop` aus, jede Haltestelle nur einmal."
+hint = "`LIKE` vergleicht mit einem Muster. `%` steht für beliebig viele beliebige Zeichen, auch für gar keines. `LIKE` achtet nicht auf Groß- und Kleinschreibung."
+solution = "SELECT DISTINCT stop FROM delays WHERE stop LIKE '%platz%';"
+
+[[exercise]]
+id = "0.8"
+section = "Textsuche"
+title = "Text beginnt mit"
+task = "Welche Haltestellen beginnen mit `Durlach`? Gib die Spalte `stop` aus, jede Haltestelle nur einmal."
+hint = "Setze das `%` nur auf der Seite, auf der noch beliebiger Text folgen darf."
+solution = "SELECT DISTINCT stop FROM delays WHERE stop LIKE 'Durlach%';"
+
+[[exercise]]
+id = "0.9"
+section = "Textsuche"
+title = "Genau zwei Zeichen"
+bonus = true
+task = "Welche Linien haben einen Namen aus genau 2 Zeichen und beginnen nicht mit `S`? Gib die Spalte `line` aus, jede Linie nur einmal."
+hint = "Der Unterstrich `_` steht für genau ein beliebiges Zeichen. Verneinen kannst du mit `NOT LIKE`."
+solution = "SELECT DISTINCT line FROM delays WHERE line LIKE '__' AND line NOT LIKE 'S%';"
+
+# ---------------------------------------------------------------------------
+# Abschnitt 4: Sortieren und Begrenzen
+# ---------------------------------------------------------------------------
+
+[[exercise]]
+id = "0.10"
+section = "Sortieren und Begrenzen"
+title = "Die fünf größten Verspätungen"
+ordered = true
+task = "Zeige die 5 größten Verspätungen: `id`, `line`, `stop`, `delay_min`. Sortiere absteigend nach `delay_min`, bei Gleichstand aufsteigend nach `id`."
+hint = "`ORDER BY` kommt nach `WHERE` und vor `LIMIT`. Absteigend heißt `DESC`. Mehrere Sortierkriterien trennst du mit Komma."
+solution = "SELECT id, line, stop, delay_min FROM delays ORDER BY delay_min DESC, id ASC LIMIT 5;"
+
+[[exercise]]
+id = "0.11"
+section = "Sortieren und Begrenzen"
+title = "Top 3 am Hauptbahnhof"
+ordered = true
+task = "Zeige die 3 Halte am `Hauptbahnhof` mit den meisten Einsteigern (`boarded`): `id`, `line`, `scheduled`, `boarded`. Sortiere absteigend nach `boarded`, bei Gleichstand aufsteigend nach `id`."
+hint = "Erst filtern (`WHERE`), dann sortieren (`ORDER BY`), dann abschneiden (`LIMIT`)."
+solution = "SELECT id, line, scheduled, boarded FROM delays WHERE stop = 'Hauptbahnhof' ORDER BY boarded DESC, id ASC LIMIT 3;"
+
+[[exercise]]
+id = "0.12"
+section = "Sortieren und Begrenzen"
+title = "Nach mehreren Spalten sortieren"
+ordered = true
+task = "Zeige `id`, `stop` und `boarded` der ersten 8 Zeilen, wenn du die Tabelle zuerst alphabetisch nach `stop` sortierst (A bis Z), bei gleicher Haltestelle absteigend nach `boarded` und bei weiterem Gleichstand aufsteigend nach `id`."
+hint = "Jede Spalte in `ORDER BY` bekommt ihre eigene Richtung (`ASC` ist der Standard, `DESC` musst du hinschreiben)."
+solution = "SELECT id, stop, boarded FROM delays ORDER BY stop ASC, boarded DESC, id ASC LIMIT 8;"
+
+[[exercise]]
+id = "0.13"
+section = "Sortieren und Begrenzen"
+title = "Plätze 6 bis 10"
+bonus = true
+ordered = true
+task = "Zeige in der Rangliste der größten Verspätungen die Plätze 6 bis 10: `id`, `line`, `stop`, `delay_min`. Sortiere absteigend nach `delay_min`, bei Gleichstand aufsteigend nach `id`."
+hint = "`LIMIT` kennt einen zweiten Teil: `LIMIT 5 OFFSET 2` überspringt zuerst 2 Zeilen und liefert dann 5."
+solution = "SELECT id, line, stop, delay_min FROM delays ORDER BY delay_min DESC, id ASC LIMIT 5 OFFSET 5;"
+
+# ---------------------------------------------------------------------------
+# Abschnitt 5: Aggregieren
+# ---------------------------------------------------------------------------
+
+[[exercise]]
+id = "0.14"
+section = "Aggregieren"
+title = "Zählen"
+task = "Wie viele Halte fanden bei Schnee statt (`weather` ist `snow`)? Eine Zeile, eine Spalte."
+hint = "`COUNT(*)` zählt die Zeilen, die nach dem Filtern übrig bleiben."
+solution = "SELECT COUNT(*) FROM delays WHERE weather = 'snow';"
+
+[[exercise]]
+id = "0.15"
+section = "Aggregieren"
+title = "Summe, Durchschnitt und Maximum"
+task = "Gib für alle Halte der S-Bahn (`mode` ist `sbahn`) in einer Zeile aus: die Gesamtzahl der Einsteiger (`boarded`), die durchschnittliche Verspätung (`delay_min`) auf 2 Nachkommastellen gerundet und die größte Verspätung. Drei Spalten in dieser Reihenfolge."
+hint = "`SUM`, `AVG` und `MAX` fassen viele Zeilen zu einem Wert zusammen. `ROUND(wert, 2)` rundet auf 2 Nachkommastellen."
+solution = "SELECT SUM(boarded), ROUND(AVG(delay_min), 2), MAX(delay_min) FROM delays WHERE mode = 'sbahn';"
+
+[[exercise]]
+id = "0.16"
+section = "Aggregieren"
+title = "Verschiedene Werte zählen"
+task = "Wie viele verschiedene Haltestellen und wie viele verschiedene Linien kommen in der Tabelle vor? Eine Zeile, zwei Spalten in dieser Reihenfolge: Haltestellen, Linien."
+hint = "`COUNT(*)` zählt Zeilen. Um verschiedene Werte einer Spalte zu zählen, schreibst du `DISTINCT` in die Klammer."
+solution = "SELECT COUNT(DISTINCT stop), COUNT(DISTINCT line) FROM delays;"
+
+# ---------------------------------------------------------------------------
+# Abschnitt 6: Gruppieren
+# ---------------------------------------------------------------------------
+
+[[exercise]]
+id = "0.17"
+section = "Gruppieren"
+title = "Je Linie zusammenfassen"
+task = "Wie viele Halte und wie viele Einsteiger insgesamt hat jede Linie? Spalten: `line`, Anzahl der Halte, Summe von `boarded`."
+hint = "`GROUP BY` bildet pro Wert einer Spalte eine Gruppe. Die Aggregatfunktionen rechnen dann pro Gruppe."
+solution = "SELECT line, COUNT(*), SUM(boarded) FROM delays GROUP BY line;"
+
+[[exercise]]
+id = "0.18"
+section = "Gruppieren"
+title = "Erst filtern, dann gruppieren"
+task = "Wie hoch ist die durchschnittliche Verspätung je Zone (`zone`), wenn du nur Halte bei Regen (`weather` ist `rain`) betrachtest? Auf 2 Nachkommastellen gerundet. Spalten: `zone`, Durchschnitt."
+hint = "`WHERE` kommt vor `GROUP BY` und sortiert einzelne Zeilen aus, bevor gruppiert wird."
+solution = "SELECT zone, ROUND(AVG(delay_min), 2) FROM delays WHERE weather = 'rain' GROUP BY zone;"
+
+[[exercise]]
+id = "0.19"
+section = "Gruppieren"
+title = "Gruppen filtern"
+ordered = true
+task = "Welche Haltestellen haben im Schnitt mehr als 3,5 Minuten Verspätung? Spalten: `stop`, Durchschnitt von `delay_min` auf 2 Nachkommastellen gerundet. Sortiere absteigend nach dem gerundeten Durchschnitt, bei Gleichstand alphabetisch nach `stop`."
+hint = "Bedingungen an einen Durchschnitt (ein Gruppenergebnis) gehören nicht in `WHERE`, sondern in `HAVING` nach dem `GROUP BY`."
+solution = "SELECT stop, ROUND(AVG(delay_min), 2) AS avg_delay FROM delays GROUP BY stop HAVING AVG(delay_min) > 3.5 ORDER BY avg_delay DESC, stop ASC;"
+
+[[exercise]]
+id = "0.20"
+section = "Gruppieren"
+title = "WHERE und HAVING zusammen"
+bonus = true
+ordered = true
+task = "Zähle je Linie nur die Halte mit mindestens 5 Minuten Verspätung und zeige nur Linien mit mindestens 50 solchen Halten. Spalten: `line`, Anzahl. Sortiere absteigend nach der Anzahl, bei Gleichstand aufsteigend nach `line`."
+hint = "Zeilen vorher aussortieren: `WHERE`. Gruppen nachher aussortieren: `HAVING`. Beides darf in einer Abfrage stehen."
+solution = "SELECT line, COUNT(*) AS n FROM delays WHERE delay_min >= 5 GROUP BY line HAVING COUNT(*) >= 50 ORDER BY n DESC, line ASC;"
+
+# ---------------------------------------------------------------------------
+# Abschnitt 7: Daten erzählen etwas
+# ---------------------------------------------------------------------------
+
+[[exercise]]
+id = "0.21"
+section = "Daten erzählen etwas"
+title = "Wann ist Hauptverkehrszeit?"
+ordered = true
+task = "Zähle je Stunde der planmäßigen Abfahrt (`scheduled`) die Halte und summiere die Einsteiger. Spalten: Stunde als zweistelliger Text (z. B. `07`), Anzahl der Halte, Summe von `boarded`. Sortiere aufsteigend nach der Stunde. Zu welchen Stunden steigen die meisten Fahrgäste ein?"
+hint = "`scheduled` hat die Form `2026-11-02 07:35`. Mit `substr(scheduled, 12, 2)` oder `strftime('%H', scheduled)` holst du die Stunde heraus. Danach gruppierst du nach diesem Ausdruck."
+solution = "SELECT substr(scheduled, 12, 2) AS stunde, COUNT(*), SUM(boarded) FROM delays GROUP BY stunde ORDER BY stunde;"
+
+[[exercise]]
+id = "0.22"
+section = "Daten erzählen etwas"
+title = "Verkehrsmittel im Vergleich"
+ordered = true
+task = "Vergleiche die Verkehrsmittel (`mode`): Spalten `mode`, Anzahl der Halte, durchschnittliche Verspätung auf 2 Nachkommastellen gerundet, größte Verspätung. Sortiere absteigend nach der gerundeten durchschnittlichen Verspätung. Welches Verkehrsmittel ist am unpünktlichsten?"
+hint = "Gruppiere nach `mode` und gib mehrere Aggregate nebeneinander aus. Gib dem gerundeten Durchschnitt mit `AS` einen Namen, dann kannst du danach sortieren."
+solution = "SELECT mode, COUNT(*), ROUND(AVG(delay_min), 2) AS avg_delay, MAX(delay_min) FROM delays GROUP BY mode ORDER BY avg_delay DESC;"
+
+[[exercise]]
+id = "0.23"
+section = "Daten erzählen etwas"
+title = "Wirkt sich Schnee aus?"
+ordered = true
+task = "Wie hoch ist die durchschnittliche Verspätung je Wetter (`weather`)? Spalten: `weather`, Durchschnitt auf 1 Nachkommastelle gerundet. Sortiere absteigend nach dem gerundeten Durchschnitt. Wirkt sich Schnee aus, und wie stark im Vergleich zu Sonne?"
+hint = "Das ist dieselbe Struktur wie beim Verkehrsmittel-Vergleich, nur mit anderer Gruppierung."
+solution = "SELECT weather, ROUND(AVG(delay_min), 1) AS avg_delay FROM delays GROUP BY weather ORDER BY avg_delay DESC;"
+
+[[exercise]]
+id = "0.24"
+section = "Daten erzählen etwas"
+title = "Hauptverkehrszeit gegen den Rest"
+bonus = true
+ordered = true
+task = "Wie viel unpünktlicher ist es in der Hauptverkehrszeit? Zähle als Hauptverkehrszeit die Stunden `07`, `08`, `16` und `17` (nach `scheduled`), alles andere als `sonst`. Spalten: Zeitraum (Text `Hauptverkehr` oder `sonst`), Anzahl der Halte, durchschnittliche Verspätung auf 2 Nachkommastellen gerundet. Sortiere alphabetisch nach dem Zeitraum."
+hint = "Mit `CASE WHEN bedingung THEN wert ELSE anderer_wert END` erzeugst du eine neue Spalte, nach der du gruppieren kannst. Die Stunde holst du wie in Aufgabe 0.21."
+solution = "SELECT CASE WHEN substr(scheduled, 12, 2) IN ('07', '08', '16', '17') THEN 'Hauptverkehr' ELSE 'sonst' END AS zeitraum, COUNT(*), ROUND(AVG(delay_min), 2) FROM delays GROUP BY zeitraum ORDER BY zeitraum;"
