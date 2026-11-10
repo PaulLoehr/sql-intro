@@ -109,7 +109,6 @@ ORDER BY name;
 id = "1.8"
 section = "Subquery"
 title = "Überdurchschnittlich verspätet"
-bonus = true
 task = "Bei wie vielen Halten in `stop_events` war die Verspätung (`delay_min`) größer als der Durchschnitt aller Halte? Spalte (1): `delayed_count`."
 hint = "Die Subquery berechnet den Durchschnitt (ein einzelner Wert), die äußere Abfrage zählt."
 solution = """
@@ -171,7 +170,6 @@ ORDER BY stop_name, line_name;
 id = "1.12"
 section = "JOIN"
 title = "Die schlimmsten Verspätungen"
-bonus = true
 task = "Zeige alle Halte mit mindestens 10 Minuten Verspätung. Spalten (4): `stop_name`, `line_name`, `scheduled`, `delay_min`. Sortiert nach `delay_min` absteigend, bei Gleichstand nach `scheduled`."
 hint = "Vier Tabellen: `stop_events` -> `stops` und `stop_events` -> `trips` -> `lines`."
 ordered = true
@@ -238,7 +236,6 @@ ORDER BY stops.zone;
 id = "1.16"
 section = "Joins und Aggregation"
 title = "Verkehrsmittel mit Problemen"
-bonus = true
 task = "Welche Verkehrsmittel (`mode` in `lines`) haben eine durchschnittliche Verspätung von mehr als 3 Minuten? Spalten (3): `mode`, `events_count`, `avg_delay` (auf 2 Nachkommastellen gerundet). Schlechteste zuerst."
 hint = "Filter auf eine Gruppe nach dem Gruppieren: `HAVING AVG(...) > 3`. Verwende dabei den ungerundeten Wert."
 ordered = true
@@ -359,7 +356,6 @@ ORDER BY avg_delay DESC, line_name;
 id = "1.23"
 section = "Fragen an das Netz"
 title = "Die drei Problemstellen"
-bonus = true
 task = "Welche Kombinationen aus Linie und Haltestelle haben die höchste durchschnittliche Verspätung? Berücksichtige nur Kombinationen mit mindestens 10 Halten und zeige die drei schlechtesten. Spalten (4): `line_name`, `stop_name`, `events_count`, `avg_delay` (auf 2 Nachkommastellen gerundet). Schlechtester zuerst, bei Gleichstand nach `line_name`, dann `stop_name`."
 hint = "Nach zwei Spalten gruppieren (Linie und Haltestelle), `HAVING COUNT(*) >= 10`, `LIMIT 3`."
 ordered = true

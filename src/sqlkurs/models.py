@@ -14,7 +14,6 @@ class Exercise(BaseModel):
     hint: str = ""
     solution: str
     ordered: bool = False  # does row order matter?
-    bonus: bool = False  # extra exercise for fast students
 
 
 class Sheet(BaseModel):

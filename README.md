@@ -36,12 +36,12 @@ Habt ihr schon Python mit `pip`, geht auch: `pip install uv`.
 ```bash
 git clone <URL-dieses-Repos> hka-sql-intro
 cd hka-sql-intro
-uv run sqlkurs
+uv run uebung0
 ```
 
-Beim ersten Start lädt uv alles Nötige (ein paar Sekunden). Dann öffnet sich der Browser mit den Aufgaben. Beenden mit Strg+C im Terminal. Ohne `git`: Repo als ZIP herunterladen, entpacken und im entpackten Ordner `uv run sqlkurs` ausführen.
+Für die zweite Übung entsprechend `uv run uebung1`. Beim ersten Start lädt uv alles Nötige (ein paar Sekunden). Dann öffnet sich der Browser mit den Aufgaben. Beenden mit Strg+C im Terminal. Ohne `git`: Repo als ZIP herunterladen, entpacken und im entpackten Ordner `uv run uebung0` ausführen.
 
-Ist Port 8000 schon belegt: `uv run sqlkurs --port 8001`.
+Ist Port 8000 schon belegt: `uv run uebung0 --port 8001`.
 
 ### Ohne uv: klassisch mit venv
 
@@ -55,7 +55,7 @@ Aktivieren: macOS/Linux `source .venv/bin/activate`, Windows `.venv\Scripts\acti
 
 ```bash
 pip install -e .
-sqlkurs
+uebung0
 ```
 
 ## Die ersten 5 Minuten: Datenbank ansehen
@@ -70,10 +70,9 @@ Was ihr im SQLite Viewer seht, ist genau das, was eure Abfragen im Browser durch
 
 ## So arbeitet ihr im Browser
 
-- Links wählt ihr Übung und Aufgabe. Aufgaben sind in Abschnitte gegliedert, jeder Abschnitt bringt eine neue Sache.
+- Links seht ihr die Abschnitte der Übung als Perlenschnur, jeder Abschnitt bringt eine neue Sache. Die Aufgaben des Abschnitts, in dem ihr gerade seid, sind aufgeklappt. Erledigtes ist lila, die aktuelle Aufgabe grün.
 - **Ausführen** (oder Strg+Enter / Cmd+Enter) zeigt das Ergebnis eurer Abfrage, **Prüfen** vergleicht es mit der Musterlösung. Es zählt das Ergebnis, nicht wie ihr es formuliert.
 - **Tipp** hilft, ohne die Lösung zu verraten. **Lösung zeigen** gibt es erst nach einem Prüfen-Versuch.
-- Aufgaben mit „Zusatz“ sind für alle, die früher fertig sind.
 - Erledigte Aufgaben merkt sich der Browser. **Datenbank zurücksetzen** stellt den Anfangszustand wieder her.
 
 ## Zurechtfinden
@@ -95,7 +94,7 @@ Was ihr im SQLite Viewer seht, ist genau das, was eure Abfragen im Browser durch
 
 ## Selbst weitermachen
 
-**Aufgabe ergänzen:** In `exercises/uebung-0.toml` oder `uebung-1.toml` einen `[[exercise]]`-Block anhängen (`id`, `section`, `title`, `task`, `hint`, `solution`, optional `ordered = true` wenn die Reihenfolge zählt, `bonus = true` für Zusatzaufgaben). Dann `uv run pytest`: der Test prüft, dass die Lösung Zeilen liefert und besteht.
+**Aufgabe ergänzen:** In `exercises/uebung-0.toml` oder `uebung-1.toml` einen `[[exercise]]`-Block anhängen (`id`, `section`, `title`, `task`, `hint`, `solution`, optional `ordered = true` wenn die Reihenfolge zählt). Dann `uv run pytest`: der Test prüft, dass die Lösung Zeilen liefert und besteht.
 
 **Daten ändern:** In `src/sqlkurs/data.py` Linien, Haltestellen oder Wahrscheinlichkeiten anpassen, dann `uv run sqlkurs build`. Aufgaben danach mit `uv run pytest` prüfen.
 
@@ -105,9 +104,10 @@ Was ihr im SQLite Viewer seht, ist genau das, was eure Abfragen im Browser durch
 
 | Befehl | Wirkung |
 |---|---|
-| `uv run sqlkurs` | Oberfläche starten (Standard), Browser öffnet sich |
-| `uv run sqlkurs --port 8001` | anderen Port nutzen |
-| `uv run sqlkurs --no-browser` | Browser nicht automatisch öffnen |
+| `uv run uebung0` | Übung 0 starten, Browser öffnet sich |
+| `uv run uebung1` | Übung 1 starten, Browser öffnet sich |
+| `uv run uebung0 --port 8001` | anderen Port nutzen |
+| `uv run uebung0 --no-browser` | Browser nicht automatisch öffnen |
 | `uv run sqlkurs build` | Datenbanken in `data/` neu erzeugen |
 | `uv run sqlkurs list` | Aufgaben auflisten |
 

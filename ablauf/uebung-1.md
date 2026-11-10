@@ -1,6 +1,6 @@
 # Übung 1: Daten verknüpfen (90 Minuten)
 
-**Datenbank:** `kvv` (5 Tabellen). **Aufgaben:** 1.1 bis 1.23 in `exercises/uebung-1.toml`, davon 19 Pflicht und 4 Zusatzaufgaben (1.8, 1.12, 1.16, 1.23).
+**Datenbank:** `kvv` (5 Tabellen). **Aufgaben:** 1.1 bis 1.23 in `exercises/uebung-1.toml`.
 
 ## Ziel
 
@@ -34,17 +34,17 @@ erDiagram
 | 10-13 | Demo 1: Tabellen und Schlüssel | |
 | 13-21 | Aufgabenzeit | 1.1 bis 1.4 |
 | 21-26 | Demo 2: Subquery | |
-| 26-34 | Aufgabenzeit | 1.5 bis 1.7 (1.8 Zusatz) |
+| 26-34 | Aufgabenzeit | 1.5 bis 1.8 |
 | 34-39 | Demo 3: JOIN | |
-| 39-51 | Aufgabenzeit | 1.9 bis 1.11 (1.12 Zusatz) |
+| 39-51 | Aufgabenzeit | 1.9 bis 1.12 |
 | 51-56 | Demo 4: Joins und Aggregation | |
-| 56-66 | Aufgabenzeit | 1.13 bis 1.15 (1.16 Zusatz) |
+| 56-66 | Aufgabenzeit | 1.13 bis 1.16 |
 | 66-70 | Demo 5: `LEFT JOIN` und `NULL` | |
 | 70-77 | Aufgabenzeit | 1.17 bis 1.19 |
-| 77-87 | Abschluss „Fragen an das Netz“ (ohne Demo, 2 Minuten Einführung) | 1.20 bis 1.22 (1.23 Zusatz) |
+| 77-87 | Abschluss „Fragen an das Netz“ (ohne Demo, 2 Minuten Einführung) | 1.20 bis 1.23 |
 | 87-90 | Rückblick: Lösungen besprechen (1.19 und 1.21 sind die Stolperfallen), Ausblick | |
 
-Zeitpuffer: Wer hinterherhinkt, überspringt Zusatzaufgaben und macht Abschnitt 6 als Hausaufgabe. Schnelle Studierende nehmen die Zusatzaufgaben.
+Zeitpuffer: Die letzte Aufgabe eines Abschnitts ist die anspruchsvollste. Wer hinterherhinkt, überspringt sie und macht Abschnitt 6 als Hausaufgabe.
 
 ## Motivation: Warum Tabellen aufteilen? (5 Minuten)
 
@@ -161,21 +161,21 @@ Die eine Zeile mehr ist `Messe Süd` mit `NULL` in allen Spalten von `line_stops
 | 1.5 | `stop_id` 9, 1, 4, 2, 8 (Positionen 1 bis 5) |
 | 1.6 | 8 Haltestellen in Zone 1, beginnend mit `Durlacher Tor`, endend mit `Mühlburger Tor` |
 | 1.7 | Entenfang, Hauptbahnhof, Kaiserplatz, Kronenplatz, Marktplatz |
-| 1.8 (Zusatz) | 568 |
+| 1.8 | 568 |
 | 1.9 | 23 Fahrten bei Schnee (erste: 90 `S1` `outbound`) |
 | 1.10 | Entenfang, Hauptbahnhof, Kronenplatz, Marktplatz, Kaiserplatz |
 | 1.11 | Ettlingen Stadt (73), Ettlingen Stadt (S1), Grötzingen (S2), Neureut Kirchfeld (12), Pfinztal Berghausen (S1) |
-| 1.12 (Zusatz) | 4 Zeilen: Grötzingen S2 12 min, dann je 10 min: Ettlingen Stadt (Linie S1), Neureut Kirchfeld (Linie 12), Durlacher Tor (Linie 1) |
+| 1.12 | 4 Zeilen: Grötzingen S2 12 min, dann je 10 min: Ettlingen Stadt (Linie S1), Neureut Kirchfeld (Linie 12), Durlacher Tor (Linie 1) |
 | 1.13 | 16 Haltestellen; `Hauptbahnhof` mit 3 Linien (S1, S2, 3), alle anderen mit 2 |
 | 1.14 | S1 4.33, S2 3.71, 73 3.57, 12 3.31, 1 2.84, 3 2.73, 2 2.60 |
 | 1.15 | Zone 1: 570 Halte, 3.21; Zone 2: 290, 3.03; Zone 3: 296, 3.03; Zone 4: 172, 4.09 |
-| 1.16 (Zusatz) | sbahn 350 Halte 3.99; bus 350 Halte 3.44 (tram mit 2.72 fällt raus) |
+| 1.16 | sbahn 350 Halte 3.99; bus 350 Halte 3.44 (tram mit 2.72 fällt raus) |
 | 1.17 | `Messe Süd`, Zone 3 |
 | 1.18 | Messe Süd 0, Kaiserplatz 32, Pfinztal Berghausen 32, Neureut Kirchfeld 35, Grötzingen 38 |
 | 1.19 | Messe Süd 0, Kaiserplatz 2 |
 | 1.20 | 12 Zeilen; Schnee ist am schlimmsten: bus 6.47, sbahn 6.54, tram 4.95; niedrigster Wert: tram bei Wolken (2.03) |
 | 1.21 | S2 125.4, S1 122.5, 2 75.4, 3 72.3, 1 69.9, 12 39.0 |
 | 1.22 | S1 5.25 (95 Halte), S2 4.43, 73 4.15, 12 3.99, 1 3.33, 3 3.27, 2 2.99 |
-| 1.23 (Zusatz) | S1 Pfinztal Berghausen 4.81, S1 Ettlingen Stadt 4.72, S1 Durlacher Tor 4.59 (je 32 Halte) |
+| 1.23 | S1 Pfinztal Berghausen 4.81, S1 Ettlingen Stadt 4.72, S1 Durlacher Tor 4.59 (je 32 Halte) |
 
 Auswertungsgedanke für die Schlussrunde: Schnee und Hauptverkehrszeit erhöhen die Verspätung, die S-Bahn ist am schlechtesten (die drei schlechtesten Kombinationen aus Linie und Haltestelle sind alle S1), Zone 4 hat die höchste Verspätung, `Messe Süd` ist Planung ohne Betrieb.

@@ -17,13 +17,14 @@ uv sync --group test
 ### Run
 
 ```bash
-uv run sqlkurs                 # build data/ if missing, start web UI, open browser
-uv run sqlkurs --port 8001 --no-browser
+uv run uebung0                 # sheet 0 only: build data/ if missing, start web UI, open browser
+uv run uebung1                 # sheet 1 only
+uv run uebung0 --port 8001 --no-browser
 uv run sqlkurs build           # (re)create data/flat.db and data/kvv.db
 uv run sqlkurs list            # list sheets and exercises
 ```
 
-Alternative without uv: `python -m venv .venv`, activate, `pip install -e .`, `sqlkurs`.
+Alternative without uv: `python -m venv .venv`, activate, `pip install -e .`, `uebung0`.
 
 ### Testing
 
@@ -36,9 +37,9 @@ Every exercise solution is tested against its own check; add a solution to a TOM
 
 ## Structure
 
-- `exercises/uebung-N.toml`: one sheet per file (`number`, `title`, `db`, `goal`, then `[[exercise]]` with `id`, `section`, `title`, `task`, `hint`, `solution`, `ordered`, `bonus`). Models in `src/sqlkurs/models.py`.
+- `exercises/uebung-N.toml`: one sheet per file (`number`, `title`, `db`, `goal`, then `[[exercise]]` with `id`, `section`, `title`, `task`, `hint`, `solution`, `ordered`). Models in `src/sqlkurs/models.py`.
 - `ablauf/uebung-N.md`: German session plans for the lecturer (minute plan, demo queries).
 - `src/sqlkurs/data.py`: seeded data generation, schemas (`flat`: table `delays`; `kvv`: normalized).
 - `src/sqlkurs/engine.py`: sandboxed execution (ATTACH/PRAGMA denied) and result comparison.
-- `src/sqlkurs/server.py`, `static/index.html`: JSON API (`/api/sheets`, `/api/schema/<db>`, `/api/run`, `/api/check`, `/api/solution/<id>`, `/api/reset`) and the single-file UI.
+- `src/sqlkurs/server.py`, `static/index.html`: JSON API (`/api/sheets`, `/api/schema/<db>`, `/api/run`, `/api/check`, `/api/solution/<id>`, `/api/reset`) and the single-file UI. Each server serves exactly one sheet (`App(..., sheet=N)`); the UI's left rail is a bead string of sections, only the current section's exercises are expanded; `#<id>` in the URL selects an exercise.
 - `data/`: generated databases (gitignored), opened by students in VS Code with the SQLite Viewer extension.

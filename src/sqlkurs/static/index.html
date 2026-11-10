@@ -9,164 +9,223 @@
     --indigo: #49439B;
     --indigo-deep: #1C1766;
     --mint: #55C1AF;
-    --sky: #4AB7D3;
-    --violet: #8D67E3;
-    --violet-deep: #572EB6;
     --text: #3E3E48;
     --white: #FFFFFF;
     --ok: #52AF00;
     --warn: #F9A825;
     --bad: #D8241C;
-    --surface: #F4F3FA;
-    --surface-2: color-mix(in srgb, var(--indigo) 12%, white);
-    --border: color-mix(in srgb, var(--indigo) 22%, white);
-    --muted: color-mix(in srgb, var(--text) 78%, white);
-    --ok-bg: color-mix(in srgb, var(--ok) 12%, white);
-    --bad-bg: color-mix(in srgb, var(--bad) 8%, white);
-    --warn-bg: color-mix(in srgb, var(--warn) 16%, white);
-    --ok-text: color-mix(in srgb, var(--ok) 45%, black);
-    --bad-text: color-mix(in srgb, var(--bad) 80%, black);
-    --warn-text: color-mix(in srgb, var(--warn) 40%, black);
-    --radius: 8px;
+
+    --page: #FFFFFF;
+    --rail: #F2F1F9;
+    --field: #F6F6F9;
+    --hover: #E8E6F3;
+    --line: #DCDBE6;
+    --muted: #74747F;
+    --indigo-soft: #ECEBF5;
+    --bad-text: #A01B15;
+    --warn-bg: #FEF5E3;
+    --warn-text: #7A5200;
+
     --font: "DM Office", Arial, sans-serif;
-    --mono: ui-monospace, Menlo, Consolas, monospace;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    --r: 4px;
   }
   * { box-sizing: border-box; }
-  html { font-size: 17px; }
+  html { font-size: 14px; }
   body {
-    margin: 0; background: var(--white); color: var(--text);
+    margin: 0; background: var(--page); color: var(--text);
     font-family: var(--font); line-height: 1.5;
-    min-height: 100vh; display: flex; flex-direction: column;
+    height: 100vh; display: flex; flex-direction: column;
+    -webkit-font-smoothing: antialiased;
   }
-  button { font: inherit; color: inherit; cursor: pointer; }
-  :focus-visible { outline: 3px solid var(--mint); outline-offset: 2px; }
-  code { font-family: var(--mono); font-size: 0.92em; background: var(--surface-2); color: var(--indigo-deep); padding: 1px 6px; border-radius: 4px; }
-  h1, h2, h3 { margin: 0; color: var(--indigo); line-height: 1.25; }
+  button { font: inherit; color: inherit; cursor: pointer; background: none; border: 0; padding: 0; }
+  :focus-visible { outline: 2px solid var(--mint); outline-offset: 2px; }
+  code { font-family: var(--mono); font-size: 0.9em; color: var(--indigo-deep); background: var(--indigo-soft); padding: 0 4px; border-radius: 3px; }
+  h1, h2, h3 { margin: 0; font-weight: 700; }
 
+  /* Header */
   header {
+    flex: none; height: 48px; padding: 0 20px;
+    display: flex; align-items: center; gap: 16px;
     background: var(--indigo); color: var(--white);
-    display: flex; flex-wrap: wrap; align-items: center; gap: 8px 24px;
-    padding: 8px 24px;
   }
-  header .brand { color: var(--white); font-size: 1.2rem; font-weight: 700; margin-right: 8px; }
-  .tabs { display: flex; gap: 8px; flex: 1; flex-wrap: wrap; }
-  .tab {
-    background: transparent; color: var(--white); border: 1px solid transparent;
-    border-radius: var(--radius); padding: 8px 16px; font-weight: 600;
+  header .brand { font-weight: 700; font-size: 1rem; }
+  header .sheet { opacity: 0.8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  header .count { margin-left: auto; white-space: nowrap; font-variant-numeric: tabular-nums; display: flex; align-items: center; gap: 8px; }
+  header .count b { font-weight: 700; }
+  .ring { width: 20px; height: 20px; transform: rotate(-90deg); flex: none; }
+  .ring circle { fill: none; stroke-width: 3; }
+  .ring .track { stroke: rgba(255, 255, 255, 0.25); }
+  .ring .fill { stroke: var(--mint); stroke-linecap: round; transition: stroke-dashoffset 0.4s ease; }
+
+  .layout { flex: 1; min-height: 0; display: grid; grid-template-columns: 264px minmax(0, 1fr) 248px; }
+
+  /* Rail with the bead string */
+  nav { background: var(--rail); overflow-y: auto; padding: 20px 12px 32px 16px; }
+  .overview {
+    display: block; width: 100%; text-align: left; padding: 6px 8px; margin-bottom: 12px;
+    border-radius: var(--r); color: var(--indigo); font-weight: 700;
   }
-  .tab:hover { background: var(--indigo-deep); }
-  .tab[aria-selected="true"] { background: var(--white); color: var(--indigo-deep); }
-  .progress { font-weight: 600; white-space: nowrap; }
+  .overview:hover { background: var(--hover); }
+  .overview[aria-current="true"] { color: var(--indigo-deep); }
 
-  .layout { display: grid; grid-template-columns: 300px 1fr; flex: 1; min-height: 0; }
-  nav { background: var(--surface); padding: 24px 16px; overflow-y: auto; }
-  nav h2 { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--indigo-deep); margin: 24px 8px 8px; }
-  nav h2:first-child { margin-top: 0; }
-  .nav-item {
-    display: flex; align-items: baseline; gap: 8px; width: 100%; text-align: left;
-    background: transparent; border: 0; border-radius: var(--radius); padding: 8px;
+  .string { list-style: none; margin: 0; padding: 0; }
+  .string li { position: relative; }
+  .row {
+    position: relative; display: grid; grid-template-columns: 24px minmax(0, 1fr); align-items: start;
+    column-gap: 8px; width: 100%; text-align: left; padding: 5px 8px 5px 0; border-radius: var(--r);
   }
-  .nav-item:hover { background: var(--surface-2); }
-  .nav-item[aria-current="true"] { background: var(--indigo); color: var(--white); }
-  .nav-item .num { font-weight: 700; min-width: 2.2em; }
-  .nav-item .label { flex: 1; }
-  .badge { font-size: 0.78rem; font-weight: 700; border-radius: 999px; padding: 0 8px; white-space: nowrap; }
-  .badge.done { background: var(--ok-bg); color: var(--ok-text); }
-  .badge.open { color: var(--muted); font-weight: 400; }
-  .badge.bonus { background: var(--white); color: var(--violet-deep); border: 1px solid var(--violet); }
-  .nav-item[aria-current="true"] .badge.open { color: var(--white); }
+  .row:hover { background: var(--hover); }
+  /* string segments: top half (from previous bead) and bottom half (to next bead) */
+  .string li::before, .string li::after {
+    content: ""; position: absolute; left: 11px; width: 2px; background: var(--line); pointer-events: none;
+  }
+  .string li::before { top: 0; height: 14px; }
+  .string li::after { top: 14px; bottom: 0; }
+  .string li:first-child::before, .string li:last-child::after { display: none; }
+  .string li.up::before, .string li.down::after { background: var(--indigo); }
 
-  main { padding: 24px 32px 48px; min-width: 0; }
-  .work { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 24px; align-items: start; }
-  .col { min-width: 0; display: flex; flex-direction: column; gap: 16px; }
+  .bead { position: relative; z-index: 1; justify-self: center; border-radius: 50%; }
 
-  .card { background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 24px; }
-  .card h1 { font-size: 1.5rem; margin-bottom: 8px; }
-  .card .meta { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 8px; color: var(--muted); font-weight: 600; }
-  .card p { margin: 0 0 8px; }
-  .notice { display: inline-block; background: var(--surface-2); color: var(--indigo-deep); border-radius: var(--radius); padding: 4px 12px; font-weight: 600; margin-top: 8px; }
-  details { margin-top: 16px; }
-  summary { cursor: pointer; color: var(--indigo); font-weight: 600; padding: 4px 0; }
-  details > div { margin-top: 8px; padding: 16px; background: var(--surface); border-radius: var(--radius); }
+  /* Beads: open = hollow, done = indigo, current = mint (the current exercise pulses gently) */
+  .sec .row { padding-top: 7px; padding-bottom: 7px; }
+  .sec .bead { width: 14px; height: 14px; margin-top: 3px; background: var(--rail); border: 2px solid var(--line); }
+  .sec.complete .bead { background: var(--indigo); border-color: var(--indigo); }
+  .sec.active .bead { background: var(--mint); border-color: var(--mint); }
+  .sec .label { font-weight: 700; color: var(--indigo-deep); }
+  .string li.sec::before { height: 17px; }
+  .string li.sec::after { top: 17px; }
 
-  .start p { max-width: 60ch; }
-  .start .goal-label { color: var(--indigo-deep); font-weight: 700; margin-top: 16px; }
+  .ex .row { padding-top: 4px; padding-bottom: 4px; }
+  .ex .bead { width: 10px; height: 10px; margin-top: 5px; background: var(--rail); border: 2px solid var(--line); }
+  .ex.done .bead { background: var(--indigo); border-color: var(--indigo); }
+  .ex .label { color: var(--text); }
+  .ex .row[aria-current="true"] .label { color: var(--indigo-deep); font-weight: 700; }
+  .ex .row[aria-current="true"] .bead { border-color: var(--mint); background: var(--mint); animation: pulse 2.4s ease-out infinite; }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(85, 193, 175, 0.55); }
+    70%, 100% { box-shadow: 0 0 0 7px rgba(85, 193, 175, 0); }
+  }
+  @media (prefers-reduced-motion: reduce) { .ex .row[aria-current="true"] .bead { animation: none; } }
 
+  /* Main */
+  main { overflow-y: auto; padding: 28px 32px 48px; min-width: 0; }
+  .col { min-width: 0; max-width: 960px; }
+
+  .eyebrow { color: var(--muted); font-size: 0.857rem; display: flex; gap: 12px; align-items: center; margin-bottom: 4px; }
+  .eyebrow .pill { color: var(--indigo); font-weight: 700; }
+  .task h1 { font-size: 1.43rem; line-height: 1.3; color: var(--indigo-deep); margin-bottom: 8px; }
+  .task p { margin: 0; max-width: 72ch; }
+  .eyebrow .order { color: var(--indigo); }
+  /* The hint always takes its final space; closed it sits behind frosted glass, so nothing moves. */
+  .hint {
+    display: block; width: 100%; max-width: 72ch; margin-top: 14px; padding: 8px 12px; text-align: left;
+    background: var(--field); border-radius: var(--r); font-size: 0.929rem;
+  }
+  .hint:hover { background: var(--hover); }
+  .hint-head { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 2px; }
+  .hint-head b { color: var(--indigo-deep); }
+  .hint-head span { color: var(--indigo); font-weight: 700; font-size: 0.857rem; }
+  .hint-text { display: block; filter: blur(5px); opacity: 0.7; user-select: none; transition: filter 0.25s ease, opacity 0.25s ease; }
+  .hint[aria-expanded="true"] .hint-text { filter: none; opacity: 1; user-select: text; }
+
+  .editor { margin-top: 24px; }
+  .editor-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+  .editor-head label { font-weight: 700; color: var(--indigo-deep); }
+  .editor-head .keys { color: var(--muted); font-size: 0.857rem; }
+  kbd { font-family: var(--font); font-size: 0.786rem; border: 1px solid var(--line); border-radius: 3px; padding: 0 4px; background: var(--white); }
   textarea {
-    width: 100%; min-height: 168px; resize: vertical;
-    font-family: var(--mono); font-size: 1rem; line-height: 1.5; tab-size: 4;
-    color: var(--text); background: var(--surface);
-    border: 1px solid var(--border); border-radius: var(--radius); padding: 16px;
+    display: block; width: 100%; min-height: 150px; resize: vertical;
+    font-family: var(--mono); font-size: 0.929rem; line-height: 1.6; tab-size: 4;
+    color: var(--text); background: var(--field);
+    border: 1px solid var(--line); border-radius: var(--r); padding: 12px 14px;
   }
-  textarea:focus-visible { outline: 3px solid var(--mint); outline-offset: 0; border-color: var(--indigo); }
-  .editor-label { display: block; font-weight: 600; color: var(--indigo-deep); margin-bottom: 8px; }
-  .hintline { color: var(--muted); font-size: 0.85rem; margin-top: 4px; }
+  textarea:focus { outline: none; border-color: var(--indigo); background: var(--white); }
 
-  .buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
-  .btn { border-radius: var(--radius); padding: 8px 20px; font-weight: 600; border: 2px solid var(--indigo); background: var(--white); color: var(--indigo); }
-  .btn:hover:not(:disabled) { background: var(--surface-2); color: var(--indigo-deep); border-color: var(--indigo-deep); }
+  .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; align-items: center; }
+  .btn { height: 32px; padding: 0 14px; border-radius: var(--r); font-weight: 700; border: 1px solid var(--indigo); color: var(--indigo); background: var(--white); }
+  .btn:hover:not(:disabled) { background: var(--indigo-soft); }
   .btn.primary { background: var(--indigo); color: var(--white); }
-  .btn.primary:hover:not(:disabled) { background: var(--indigo-deep); color: var(--white); }
-  .btn.success { background: var(--mint); border-color: var(--mint); color: var(--indigo-deep); }
-  .btn.success:hover:not(:disabled) { background: var(--indigo-deep); border-color: var(--indigo-deep); color: var(--white); }
-  .btn:disabled { opacity: 0.45; cursor: not-allowed; }
-  .btn.small { padding: 4px 16px; font-size: 0.9rem; }
+  .btn.primary:hover:not(:disabled) { background: var(--indigo-deep); border-color: var(--indigo-deep); }
+  .btn.quiet { border-color: transparent; }
+  .btn.check { min-width: 120px; }
+  .btn.check.ok, .btn.check.ok:hover { background: var(--ok); border-color: var(--ok); color: var(--white); }
+  .btn.check.bad, .btn.check.bad:hover { background: var(--bad); border-color: var(--bad); color: var(--white); }
+  .verdict { flex: 1 1 0; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--bad-text); font-size: 0.857rem; }
+  .btn.next { margin-left: auto; }
+  .btn.next.ready { background: var(--mint); border-color: var(--mint); color: var(--indigo-deep); }
+  .btn.next.ready:hover { background: var(--indigo-deep); border-color: var(--indigo-deep); color: var(--white); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
   #messages { margin-top: 16px; }
-  .msg { border-radius: var(--radius); padding: 12px 16px; font-weight: 600; margin-bottom: 8px; border: 1px solid; }
-  .msg.ok { background: var(--ok-bg); color: var(--ok-text); border-color: var(--ok); }
-  .msg.bad { background: var(--bad-bg); color: var(--bad-text); border-color: var(--bad); white-space: pre-wrap; font-family: var(--mono); font-size: 0.95rem; font-weight: 400; }
-  .msg.bad.plain { font-family: var(--font); font-weight: 600; font-size: inherit; }
-  .msg.info { background: var(--surface); color: var(--text); border-color: var(--border); font-weight: 400; }
-  .solution { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin: 0 0 8px; }
-  .solution .cap { font-weight: 700; color: var(--indigo-deep); margin-bottom: 8px; }
-  .solution pre { margin: 0; font-family: var(--mono); font-size: 0.95rem; white-space: pre-wrap; overflow-x: auto; }
+  .sqlerr { margin: 0; font-family: var(--mono); font-size: 0.857rem; white-space: pre-wrap; color: var(--bad-text); }
+  .plain { margin: 0; color: var(--muted); }
+  .solution { margin-bottom: 10px; }
+  .solution .cap { font-weight: 700; color: var(--indigo-deep); margin-bottom: 4px; font-size: 0.929rem; }
+  .solution pre { margin: 0; font-family: var(--mono); font-size: 0.857rem; line-height: 1.6; white-space: pre-wrap; background: var(--field); border-radius: var(--r); padding: 10px 14px; }
 
-  .result { margin-top: 8px; }
-  .tablewrap { overflow: auto; max-height: 420px; border: 1px solid var(--border); border-radius: var(--radius); }
-  table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
-  th, td { padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
-  th { position: sticky; top: 0; background: var(--surface-2); color: var(--indigo-deep); font-weight: 700; }
-  tbody tr:nth-child(even) td { background: var(--surface); }
+  .tablewrap { overflow: auto; max-height: 420px; border: 1px solid var(--line); border-radius: var(--r); }
+  table { border-collapse: collapse; width: 100%; font-size: 0.857rem; }
+  th, td { padding: 5px 10px; text-align: left; white-space: nowrap; }
+  th { position: sticky; top: 0; background: var(--white); color: var(--indigo-deep); font-weight: 700; box-shadow: inset 0 -1px var(--line); }
+  td { border-top: 1px solid #EFEFF3; }
+  tbody tr:hover td { background: var(--field); }
   td.null { color: var(--muted); font-style: italic; }
-  td.num { font-variant-numeric: tabular-nums; }
-  .rowinfo { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; color: var(--muted); font-size: 0.92rem; }
-  .trunc { background: var(--warn-bg); color: var(--warn-text); border: 1px solid var(--warn); border-radius: 999px; padding: 0 12px; font-weight: 600; }
+  td.num { font-variant-numeric: tabular-nums; text-align: right; }
+  .rowinfo { margin-top: 6px; display: flex; gap: 12px; align-items: center; color: var(--muted); font-size: 0.857rem; }
+  .trunc { background: var(--warn-bg); color: var(--warn-text); border-radius: var(--r); padding: 0 6px; font-weight: 700; }
 
-  aside.schema { background: var(--surface); border-radius: 12px; padding: 16px; }
-  aside.schema h2 { font-size: 1.05rem; margin-bottom: 16px; }
-  .tbl { margin-bottom: 16px; }
-  .tbl h3 { font-size: 0.95rem; font-family: var(--mono); color: var(--indigo-deep); margin-bottom: 4px; }
-  .tbl ul { list-style: none; margin: 0; padding: 0; font-size: 0.88rem; }
-  .tbl li { display: flex; justify-content: space-between; gap: 8px; padding: 2px 0; }
+  /* Schema */
+  aside.schema { background: var(--rail); overflow-y: auto; padding: 24px 16px 32px; font-size: 0.857rem; }
+  aside.schema h2 { font-size: 0.786rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin-bottom: 10px; }
+  .tbl { margin-bottom: 14px; }
+  .tbl h3 { font-family: var(--mono); font-size: 0.929rem; color: var(--indigo); margin-bottom: 2px; }
+  .tbl ul { list-style: none; margin: 0; padding: 0; }
+  .tbl li { display: flex; justify-content: space-between; gap: 8px; padding: 1px 0; }
   .tbl .cname { font-family: var(--mono); }
-  .tbl .ctype { color: var(--muted); font-size: 0.8rem; text-align: right; }
-  .pk { font-size: 0.7rem; font-weight: 700; background: var(--indigo); color: var(--white); border-radius: 4px; padding: 0 4px; margin-left: 4px; vertical-align: 1px; }
+  .tbl .ctype { color: var(--muted); font-size: 0.786rem; }
+  .pk { font-family: var(--font); font-size: 0.714rem; font-weight: 700; color: var(--indigo); margin-left: 6px; }
+  .reset { color: var(--indigo); font-weight: 700; font-size: 0.857rem; margin-top: 4px; }
+  .reset:hover { text-decoration: underline; }
+
+  /* Start page */
+  .start h1 { font-size: 1.71rem; color: var(--indigo-deep); margin-bottom: 16px; }
+  .start h2 { font-size: 0.786rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin: 0 0 4px; }
+  .start p { margin: 0 0 20px; max-width: 64ch; }
+  .start .plan { list-style: none; margin: 0 0 24px; padding: 0; max-width: 64ch; }
+  .start .plan li { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #EFEFF3; }
+  .start .plan li span:last-child { color: var(--muted); font-variant-numeric: tabular-nums; }
 
   .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
-  @media (max-width: 1280px) {
-    .work { grid-template-columns: minmax(0, 1fr); }
+  @media (max-width: 1100px) {
+    .layout { grid-template-columns: 240px minmax(0, 1fr); grid-template-rows: auto 1fr; }
+    nav { grid-row: 1 / 3; }
+    aside.schema { grid-column: 2; grid-row: 1; overflow: visible; padding: 12px 32px; display: flex; flex-wrap: wrap; gap: 4px 24px; align-items: baseline; }
+    aside.schema h2 { flex-basis: 100%; margin: 0; }
+    #schema-body { display: contents; }
+    .tbl { margin: 0; }
   }
-  @media (max-width: 900px) {
-    html { font-size: 16px; }
-    header { padding: 8px 16px; }
-    .layout { grid-template-columns: 1fr; }
-    nav { padding: 16px; max-height: 40vh; }
-    main { padding: 16px 16px 40px; }
-    .card { padding: 16px; }
+  @media (max-width: 760px) {
+    body { height: auto; }
+    .layout { grid-template-columns: 1fr; grid-template-rows: auto; }
+    nav { grid-row: auto; max-height: 45vh; }
+    aside.schema { grid-column: auto; grid-row: auto; padding: 12px 16px; }
+    main { padding: 20px 16px 40px; overflow: visible; }
+    header .sheet { display: none; }
   }
 </style>
 </head>
 <body>
 <header>
   <span class="brand">SQL-Einführung</span>
-  <div class="tabs" id="tabs" role="tablist" aria-label="Übungen"></div>
-  <div class="progress" id="progress"></div>
+  <span class="sheet" id="sheet-title"></span>
+  <span class="count" id="count"></span>
 </header>
 <div class="layout">
   <nav id="nav" aria-label="Aufgaben"></nav>
   <main id="main" aria-label="Aufgabenbereich"></main>
+  <aside class="schema" id="schema" aria-label="Datenbankschema"></aside>
 </div>
 <div id="live" class="sr" aria-live="polite"></div>
 
@@ -181,8 +240,7 @@ const store = {
   set(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) { /* ignore */ } },
 };
 
-let sheets = [];
-let sheetIdx = 0;
+let sheet = null;
 let currentId = null;
 const done = new Set(store.get("sqlkurs.done", []));
 const drafts = store.get("sqlkurs.drafts", {}) || {};
@@ -196,101 +254,144 @@ async function api(path, body) {
   return r.json();
 }
 
-const allExercises = () => sheets.flatMap((s) => s.exercises);
-const sheetOf = (id) => sheets.findIndex((s) => s.exercises.some((e) => e.id === id));
-const exById = (id) => allExercises().find((e) => e.id === id);
-
+const exById = (id) => sheet.exercises.find((e) => e.id === id);
 function announce(text) { $("live").textContent = ""; setTimeout(() => { $("live").textContent = text; }, 30); }
 
+/** Sections in order of first appearance, each with its exercises. */
+function sections() {
+  const out = [];
+  for (const e of sheet.exercises) {
+    let s = out[out.length - 1];
+    if (!s || s.name !== e.section) { s = { name: e.section, exercises: [] }; out.push(s); }
+    s.exercises.push(e);
+  }
+  return out;
+}
+const isComplete = (s) => s.exercises.every((e) => done.has(e.id));
+
 function renderHeader() {
-  $("tabs").innerHTML = sheets.map((s, i) =>
-    `<button class="tab" role="tab" data-i="${i}" aria-selected="${i === sheetIdx}">Übung ${esc(s.number)}</button>`).join("");
-  $("tabs").querySelectorAll(".tab").forEach((b) => b.onclick = () => { sheetIdx = +b.dataset.i; currentId = null; renderAll(); });
-  const total = allExercises().length;
-  $("progress").textContent = `${done.size} / ${total} erledigt`;
+  $("sheet-title").textContent = `Übung ${sheet.number} · ${sheet.title}`;
+  const total = sheet.exercises.length;
+  const n = sheet.exercises.filter((e) => done.has(e.id)).length;
+  const c = 2 * Math.PI * 8;  // circumference for r = 8
+  $("count").innerHTML =
+    `<svg class="ring" viewBox="0 0 20 20" aria-hidden="true"><circle class="track" cx="10" cy="10" r="8"/>` +
+    `<circle class="fill" cx="10" cy="10" r="8" stroke-dasharray="${c}" stroke-dashoffset="${c * (1 - (total ? n / total : 0))}"${n ? "" : ' style="display:none"'}/></svg>` +
+    `<span><b>${n}</b> von ${total} erledigt</span>`;
 }
 
 function renderNav() {
-  const sheet = sheets[sheetIdx];
-  let html = "", section = null;
-  for (const e of sheet.exercises) {
-    if (e.section !== section) { section = e.section; html += `<h2>${esc(section)}</h2>`; }
-    const isDone = done.has(e.id);
-    html += `<button class="nav-item" data-id="${esc(e.id)}"${e.id === currentId ? ' aria-current="true"' : ""}>` +
-      `<span class="num">${esc(e.id)}</span><span class="label">${esc(e.title)}</span>` +
-      (e.bonus ? `<span class="badge bonus">Zusatz</span>` : "") +
-      `<span class="badge ${isDone ? "done" : "open"}">${isDone ? "erledigt" : "offen"}</span></button>`;
+  const current = currentId ? exById(currentId) : null;
+  // Rows of the bead string: every section, plus the exercises of the current one.
+  const rows = [];
+  for (const s of sections()) {
+    const active = current && current.section === s.name;
+    const nDone = s.exercises.filter((e) => done.has(e.id)).length;
+    rows.push({ kind: "sec", s, active, nDone, done: active ? done.has(s.exercises[0].id) : isComplete(s) });
+    if (active) for (const e of s.exercises) rows.push({ kind: "ex", e, done: done.has(e.id) });
   }
-  $("nav").innerHTML = html;
-  $("nav").querySelectorAll(".nav-item").forEach((b) => b.onclick = () => select(b.dataset.id));
+  const html = rows.map((r, i) => {
+    const cls = [r.kind, i > 0 && rows[i - 1].done ? "up" : "", r.done ? "down" : ""];
+    if (r.kind === "sec") {
+      cls.push(isComplete(r.s) ? "complete" : "", r.active ? "active" : "");
+      return `<li class="${cls.join(" ")}"><button class="row" data-sec="${esc(r.s.name)}"${r.active ? ' aria-expanded="true"' : ' aria-expanded="false"'}>` +
+        `<span class="bead" aria-hidden="true"></span>` +
+        `<span class="label">${esc(r.s.name)}<span class="sr"> (${r.nDone} von ${r.s.exercises.length} erledigt)</span></span></button></li>`;
+    }
+    const e = r.e;
+    cls.push(r.done ? "done" : "");
+    return `<li class="${cls.join(" ")}"><button class="row" data-id="${esc(e.id)}"${e.id === currentId ? ' aria-current="true"' : ""}>` +
+      `<span class="bead" aria-hidden="true"></span>` +
+      `<span class="label">${esc(e.title)}${r.done ? '<span class="sr"> (erledigt)</span>' : ""}</span></button></li>`;
+  }).join("");
+  $("nav").innerHTML =
+    `<button class="overview"${currentId ? "" : ' aria-current="true"'} id="to-start">Überblick</button>` +
+    `<ol class="string">${html}</ol>`;
+  $("to-start").onclick = () => select(null);
+  $("nav").querySelectorAll("[data-id]").forEach((b) => b.onclick = () => select(b.dataset.id));
+  $("nav").querySelectorAll("[data-sec]").forEach((b) => b.onclick = () => {
+    const s = sections().find((x) => x.name === b.dataset.sec);
+    if (current && current.section === s.name) return;
+    const next = s.exercises.find((e) => !done.has(e.id)) || s.exercises[0];
+    select(next.id);
+  });
 }
 
 async function loadSchema(db) {
-  const box = $("schema-body");
-  if (!box) return;
   try {
     if (!schemaCache[db]) schemaCache[db] = await api(`/api/schema/${encodeURIComponent(db)}`);
-    const cur = $("schema-body");
-    if (!cur || cur.dataset.db !== db) return;
-    cur.innerHTML = schemaCache[db].map((t) =>
+    const box = $("schema-body");
+    if (!box) return;
+    box.innerHTML = schemaCache[db].map((t) =>
       `<div class="tbl"><h3>${esc(t.table)}</h3><ul>` + t.columns.map((c) =>
         `<li><span class="cname">${esc(c.name)}${c.pk ? '<span class="pk" title="Primärschlüssel">PK</span>' : ""}</span><span class="ctype">${esc(c.type || "")}</span></li>`).join("") +
       `</ul></div>`).join("");
   } catch (e) {
-    box.textContent = "Schema konnte nicht geladen werden.";
+    const box = $("schema-body");
+    if (box) box.textContent = "Schema konnte nicht geladen werden.";
   }
 }
 
-function schemaPanel(db) {
-  return `<aside class="schema" aria-label="Datenbankschema">
-    <h2>Datenbank</h2>
-    <div id="schema-body" data-db="${esc(db)}">Lade ...</div>
-    <button class="btn small" id="reset">Datenbank zurücksetzen</button>
-  </aside>`;
+function renderSchemaPanel() {
+  $("schema").innerHTML = `<h2>Datenbank ${esc(sheet.db)}</h2>
+    <div id="schema-body">Lade …</div>
+    <button class="reset" id="reset">Datenbank zurücksetzen</button>`;
+  $("reset").onclick = resetDb;
+  loadSchema(sheet.db);
 }
 
-async function resetDb(db) {
+async function resetDb() {
+  const b = $("reset");
+  const flash = (text) => { b.textContent = text; setTimeout(() => { b.textContent = "Datenbank zurücksetzen"; }, 2000); };
   try {
     await api("/api/reset", { db: "" });
     schemaCache = {};
-    showMessages(`<div class="msg info">Datenbank zurückgesetzt.</div>`);
+    flash("Zurückgesetzt ✓");
     announce("Datenbank zurückgesetzt");
-    loadSchema(db);
+    loadSchema(sheet.db);
   } catch (e) {
-    showMessages(`<div class="msg bad plain">Zurücksetzen fehlgeschlagen.</div>`);
+    flash("Zurücksetzen fehlgeschlagen");
   }
 }
 
 function renderMain() {
-  const sheet = sheets[sheetIdx];
-  if (!currentId) return renderStart(sheet);
+  if (!currentId) return renderStart();
   const e = exById(currentId);
   const idx = sheet.exercises.findIndex((x) => x.id === e.id);
-  const hasNext = idx < sheet.exercises.length - 1;
-  $("main").innerHTML = `<div class="work"><div class="col">
-    <section class="card" aria-labelledby="task-title">
-      <div class="meta"><span>Aufgabe ${esc(e.id)}</span>${e.bonus ? '<span class="badge bonus">Zusatz</span>' : ""}<span>${esc(e.section)}</span></div>
+  const next = sheet.exercises[idx + 1];
+  $("main").innerHTML = `<div class="col">
+    <section class="task" aria-labelledby="task-title">
+      <div class="eyebrow"><span class="pill">Aufgabe ${esc(e.id)}</span><span>${esc(e.section)}</span>${e.ordered ? '<span class="order">Reihenfolge zählt</span>' : ""}</div>
       <h1 id="task-title">${esc(e.title)}</h1>
       <p>${fmt(e.task)}</p>
-      ${e.ordered ? '<div class="notice">Reihenfolge zählt</div>' : ""}
-      ${e.hint ? `<details><summary>Tipp</summary><div>${fmt(e.hint)}</div></details>` : ""}
+      ${e.hint ? `<button class="hint" id="hint" aria-expanded="false">
+        <span class="hint-head"><b>Tipp</b><span id="hint-action">anzeigen</span></span>
+        <span class="hint-text" id="hint-text" aria-hidden="true">${fmt(e.hint)}</span>
+      </button>` : ""}
     </section>
-    <section aria-label="SQL-Editor">
-      <label class="editor-label" for="sql">Deine SQL-Abfrage</label>
-      <textarea id="sql" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="SELECT ..."></textarea>
-      <div class="hintline">Strg/Cmd + Enter führt aus. Tab rückt ein.</div>
-      <div class="buttons">
+    <section class="editor" aria-label="SQL-Editor">
+      <div class="editor-head"><label for="sql">Deine Abfrage</label><span class="keys"><kbd>Strg</kbd>/<kbd>Cmd</kbd> + <kbd>Enter</kbd> führt aus</span></div>
+      <textarea id="sql" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="SELECT …"></textarea>
+      <div class="actions">
         <button class="btn primary" id="run">Ausführen</button>
-        <button class="btn" id="check">Prüfen</button>
-        <button class="btn" id="solution" disabled title="Erst nach einem Prüfen-Versuch verfügbar">Lösung zeigen</button>
-        <button class="btn${passed.has(e.id) ? " success" : ""}" id="next"${hasNext ? "" : " disabled"}>Weiter</button>
+        <button class="btn check" id="check">Prüfen</button>
+        <button class="btn quiet" id="solution" disabled title="Erst nach einem Prüfen-Versuch verfügbar">Lösung zeigen</button>
+        <span class="verdict" id="verdict"></span>
+        <button class="btn next${passed.has(e.id) ? " ready" : ""}" id="next"${next ? "" : " disabled"}>${next ? "Nächste Aufgabe" : "Letzte Aufgabe"}</button>
       </div>
       <div id="messages" aria-live="polite"></div>
     </section>
-  </div>${schemaPanel(sheet.db)}</div>`;
+  </div>`;
   const ta = $("sql");
   ta.value = drafts[e.id] || "";
-  ta.addEventListener("input", () => { drafts[e.id] = ta.value; store.set("sqlkurs.drafts", drafts); });
+  ta.addEventListener("input", () => { drafts[e.id] = ta.value; store.set("sqlkurs.drafts", drafts); setVerdict(null); });
+  if (e.hint) $("hint").onclick = () => {
+    const open = $("hint").getAttribute("aria-expanded") !== "true";
+    $("hint").setAttribute("aria-expanded", String(open));
+    $("hint-text").setAttribute("aria-hidden", String(!open));
+    $("hint-action").textContent = open ? "ausblenden" : "anzeigen";
+    if (open) announce("Tipp: " + e.hint);
+  };
   ta.addEventListener("keydown", (ev) => {
     if (ev.key === "Tab" && !ev.shiftKey && !ev.ctrlKey && !ev.altKey && !ev.metaKey) {
       ev.preventDefault();
@@ -305,39 +406,37 @@ function renderMain() {
   $("run").onclick = run;
   $("check").onclick = check;
   $("solution").onclick = showSolution;
-  $("next").onclick = () => { if (hasNext) select(sheet.exercises[idx + 1].id); };
-  $("reset").onclick = () => resetDb(sheet.db);
+  $("next").onclick = () => { if (next) select(next.id); };
   if (attempted.has(e.id)) $("solution").disabled = false;
-  loadSchema(sheet.db);
 }
 
-function renderStart(sheet) {
-  const first = sheet.exercises[0];
-  const db = sheet.db;
-  $("main").innerHTML = `<div class="work"><div class="col">
-    <section class="card start">
-      <div class="meta"><span>Übung ${esc(sheet.number)}</span></div>
+function renderStart() {
+  const first = sheet.exercises.find((e) => !done.has(e.id)) || sheet.exercises[0];
+  const plan = sections().map((s) =>
+    `<li><span>${esc(s.name)}</span><span>${s.exercises.length} ${s.exercises.length === 1 ? "Aufgabe" : "Aufgaben"}</span></li>`).join("");
+  const started = sheet.exercises.some((e) => done.has(e.id));
+  $("main").innerHTML = `<div class="col start">
+      <div class="eyebrow"><span class="pill">Übung ${esc(sheet.number)}</span></div>
       <h1>${esc(sheet.title)}</h1>
-      <div class="goal-label">Ziel</div>
+      <h2>Ziel</h2>
       <p>${fmt(sheet.goal || "")}</p>
-      <div class="buttons"><button class="btn primary" id="start"${first ? "" : " disabled"}>Mit Aufgabe 1 starten</button></div>
-      <div id="messages" aria-live="polite"></div>
-    </section>
-  </div>${schemaPanel(db)}</div>`;
+      <h2>Ablauf</h2>
+      <ol class="plan">${plan}</ol>
+      <div class="actions"><button class="btn primary" id="start"${first ? "" : " disabled"}>${started ? "Weitermachen" : "Mit der ersten Aufgabe starten"}</button></div>
+    </div>`;
   if (first) $("start").onclick = () => select(first.id);
-  $("reset").onclick = () => resetDb(db);
-  loadSchema(db);
 }
 
 function renderAll() { renderHeader(); renderNav(); renderMain(); }
 
 function select(id) {
   currentId = id;
-  const si = sheetOf(id);
-  if (si >= 0) sheetIdx = si;
+  history.replaceState(null, "", id ? `#${id}` : location.pathname);
   renderAll();
   const t = $("task-title"); if (t) { t.setAttribute("tabindex", "-1"); t.focus({ preventScroll: true }); }
-  window.scrollTo(0, 0);
+  $("main").scrollTo(0, 0);
+  const cur = $("nav").querySelector('[aria-current="true"]');
+  if (cur) cur.scrollIntoView({ block: "nearest" });
 }
 
 function cell(v) {
@@ -345,23 +444,33 @@ function cell(v) {
   return `<td${typeof v === "number" ? ' class="num"' : ""}>${esc(v)}</td>`;
 }
 function resultHtml(res) {
-  if (res.error) return `<div class="msg bad">${esc(res.error)}</div>`;
-  if (!res.columns || !res.columns.length) return `<div class="msg info">In Ordnung, ${res.rowcount} Zeile(n) betroffen.</div>`;
+  if (res.error) return `<pre class="sqlerr">${esc(res.error)}</pre>`;
+  if (!res.columns || !res.columns.length) return `<p class="plain">In Ordnung, ${res.rowcount} Zeile(n) betroffen.</p>`;
   const head = res.columns.map((c) => `<th scope="col">${esc(c)}</th>`).join("");
   const rows = res.rows.map((r) => `<tr>${r.map(cell).join("")}</tr>`).join("");
   const n = res.rows.length;
-  return `<div class="result"><div class="tablewrap"><table><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table></div>
-    <div class="rowinfo"><span>${n} ${n === 1 ? "Zeile" : "Zeilen"}</span>${res.truncated ? '<span class="trunc">gekürzt</span>' : ""}</div></div>`;
+  return `<div class="tablewrap"><table><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table></div>
+    <div class="rowinfo"><span>${n} ${n === 1 ? "Zeile" : "Zeilen"}</span>${res.truncated ? '<span class="trunc">gekürzt</span>' : ""}</div>`;
 }
 function showMessages(html) { const m = $("messages"); if (m) m.innerHTML = html; }
 
+/** Feedback lives on the Prüfen button itself; `reason` is a short note in a fixed slot beside it. */
+function setVerdict(state, reason = "") {
+  const b = $("check"), v = $("verdict");
+  if (!b) return;
+  b.classList.toggle("ok", state === "ok");
+  b.classList.toggle("bad", state === "bad");
+  b.textContent = state === "ok" ? "Richtig ✓" : state === "bad" ? "Nicht richtig" : "Prüfen";
+  v.textContent = reason; v.title = reason;
+}
+
 async function run() {
-  const e = exById(currentId); if (!e) return;
+  if (!currentId) return;
   try {
-    const res = await api("/api/run", { db: sheets[sheetIdx].db, sql: $("sql").value });
+    const res = await api("/api/run", { db: sheet.db, sql: $("sql").value });
     showMessages(resultHtml(res));
     announce(res.error ? "Fehler bei der Ausführung" : "Abfrage ausgeführt");
-  } catch (err) { showMessages(`<div class="msg bad plain">Server nicht erreichbar.</div>`); }
+  } catch (err) { showMessages(`<pre class="sqlerr">Server nicht erreichbar.</pre>`); }
 }
 
 async function check() {
@@ -373,11 +482,13 @@ async function check() {
     if (r.ok) {
       done.add(e.id); passed.add(e.id); store.set("sqlkurs.done", [...done]);
       renderHeader(); renderNav();
-      $("next").classList.add("success");
+      $("next").classList.add("ready");
     }
-    showMessages(`<div class="msg ${r.ok ? "ok" : "bad plain"}">${esc(r.message || (r.ok ? "Richtig." : "Nicht richtig."))}</div>` + (r.result ? resultHtml(r.result) : ""));
-    announce(r.message || (r.ok ? "Richtig" : "Nicht richtig"));
-  } catch (err) { showMessages(`<div class="msg bad plain">Server nicht erreichbar.</div>`); }
+    const sqlError = r.result && r.result.error;
+    setVerdict(r.ok ? "ok" : "bad", r.ok ? "" : sqlError ? "Fehler in der Abfrage, siehe unten." : r.message);
+    showMessages(r.result ? resultHtml(r.result) : "");
+    announce(r.ok ? "Richtig" : `Nicht richtig. ${r.message || ""}`);
+  } catch (err) { setVerdict("bad", "Server nicht erreichbar."); }
 }
 
 async function showSolution() {
@@ -385,17 +496,23 @@ async function showSolution() {
   try {
     const r = await api(`/api/solution/${encodeURIComponent(e.id)}`);
     showMessages(`<div class="solution"><div class="cap">Musterlösung</div><pre>${esc(r.solution || "")}</pre></div>`);
-  } catch (err) { showMessages(`<div class="msg bad plain">Lösung konnte nicht geladen werden.</div>`); }
+  } catch (err) { showMessages(`<pre class="sqlerr">Lösung konnte nicht geladen werden.</pre>`); }
 }
 
 (async () => {
+  let sheets;
   try {
     sheets = await api("/api/sheets");
   } catch (e) {
-    $("main").innerHTML = `<div class="msg bad plain">Aufgaben konnten nicht geladen werden.</div>`;
+    $("main").innerHTML = `<pre class="sqlerr">Aufgaben konnten nicht geladen werden.</pre>`;
     return;
   }
-  if (!sheets.length) { $("main").textContent = "Keine Übungen vorhanden."; return; }
+  if (!sheets.length) { $("main").textContent = "Keine Übung vorhanden."; return; }
+  sheet = sheets[0];
+  document.title = `Übung ${sheet.number} · SQL-Einführung`;
+  const fromHash = decodeURIComponent(location.hash.slice(1));
+  if (exById(fromHash)) currentId = fromHash;
+  renderSchemaPanel();
   renderAll();
 })();
 </script>

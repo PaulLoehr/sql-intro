@@ -33,8 +33,10 @@ class ResetRequest(BaseModel):
 class App:
     """Holds the pristine databases, the working copies and the exercises."""
 
-    def __init__(self, exercises_dir: Path, work_dir: Path) -> None:
-        self.sheets = load_sheets(exercises_dir)
+    def __init__(self, exercises_dir: Path, work_dir: Path, sheet: int | None = None) -> None:
+        self.sheets = [s for s in load_sheets(exercises_dir) if sheet is None or s.number == sheet]
+        if not self.sheets:
+            raise ValueError(f"Übung {sheet} gibt es nicht")
         self.pristine = build_all(work_dir / "pristine")
         self.working = {name: work_dir / f"{name}.db" for name in self.pristine}
         self.scratch = work_dir / "scratch"
@@ -154,16 +156,22 @@ def make_handler(app: App) -> type[BaseHTTPRequestHandler]:
 
 
 def serve(
-    exercises_dir: Path, host: str = "127.0.0.1", port: int = 8000, open_browser: bool = True
+    exercises_dir: Path,
+    sheet: int | None = None,
+    host: str = "127.0.0.1",
+    port: int = 8000,
+    open_browser: bool = True,
 ) -> None:
     with tempfile.TemporaryDirectory(prefix="sqlkurs-") as tmp:
-        app = App(exercises_dir, Path(tmp))
+        app = App(exercises_dir, Path(tmp), sheet)
         try:
             server = ThreadingHTTPServer((host, port), make_handler(app))
         except OSError:
-            raise SystemExit(f"Port {port} ist belegt. Anderen Port wählen: sqlkurs --port {port + 1}")
+            command = f"uebung{sheet}" if sheet is not None else "sqlkurs"
+            raise SystemExit(f"Port {port} ist belegt. Anderen Port wählen: {command} --port {port + 1}")
         url = f"http://{host}:{port}"
-        print(f"SQL-Einführung läuft auf {url}  (Strg+C beendet das Programm)")
+        label = f"Übung {sheet}" if sheet is not None else "SQL-Einführung"
+        print(f"{label} läuft auf {url}  (Strg+C beendet das Programm)")
         if open_browser:
             webbrowser.open(url)
         try:

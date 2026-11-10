@@ -1,6 +1,6 @@
 # Ablaufplan Übung 0: Abfragen auf einer Tabelle
 
-Dauer: 90 Minuten. Datenbank `flat`, Tabelle `delays`. Aufgaben `0.1` bis `0.24` in der Browser-Oberfläche (`exercises/uebung-0.toml`), davon 4 Zusatzaufgaben (`0.9`, `0.13`, `0.20`, `0.24`) für Schnelle.
+Dauer: 90 Minuten. Datenbank `flat`, Tabelle `delays`. Aufgaben `0.1` bis `0.24` in der Browser-Oberfläche (`exercises/uebung-0.toml`).
 
 ## Ziel
 
@@ -23,18 +23,18 @@ Die Studierenden stellen eigenständig Fragen an eine einzelne Tabelle: Spalten 
 | 16-20 | 2 Filtern | Demo: `WHERE`, `AND`, `OR`, `NOT`, `IN`, `BETWEEN` | - |
 | 20-29 | 2 Filtern | Aufgabenzeit | 0.4 bis 0.6 |
 | 29-32 | 3 Textsuche | Demo: `LIKE`, `%`, `_` | - |
-| 32-39 | 3 Textsuche | Aufgabenzeit | 0.7, 0.8 (Zusatz 0.9) |
+| 32-39 | 3 Textsuche | Aufgabenzeit | 0.7 bis 0.9 |
 | 39-43 | 4 Sortieren | Demo: `ORDER BY`, `DESC`, `LIMIT` | - |
-| 43-51 | 4 Sortieren | Aufgabenzeit | 0.10 bis 0.12 (Zusatz 0.13) |
+| 43-51 | 4 Sortieren | Aufgabenzeit | 0.10 bis 0.13 |
 | 51-55 | 5 Aggregieren | Demo: `COUNT`, `SUM`, `AVG`, `MIN`, `MAX`, `ROUND` | - |
 | 55-63 | 5 Aggregieren | Aufgabenzeit | 0.14 bis 0.16 |
 | 63-68 | 6 Gruppieren | Demo: `GROUP BY`, `HAVING`, `WHERE` gegen `HAVING` | - |
-| 68-77 | 6 Gruppieren | Aufgabenzeit | 0.17 bis 0.19 (Zusatz 0.20) |
+| 68-77 | 6 Gruppieren | Aufgabenzeit | 0.17 bis 0.20 |
 | 77-80 | 7 Daten erzählen etwas | Demo: Stunde mit `substr` herausschneiden | - |
-| 80-86 | 7 Daten erzählen etwas | Aufgabenzeit | 0.21 bis 0.23 (Zusatz 0.24) |
+| 80-86 | 7 Daten erzählen etwas | Aufgabenzeit | 0.21 bis 0.24 |
 | 86-90 | Abschluss | Ergebnisse besprechen, offene Fragen | - |
 
-Faustregel: Wer im Abschnitt schneller fertig ist, macht die Zusatzaufgabe. Wer hängt, überspringt sie. Wenn die Zeit knapp wird, kürzen Sie die Aufgabenzeit von Abschnitt 3 und lassen `0.8` als Hausaufgabe, die Abschnitte 5 bis 7 haben Vorrang.
+Faustregel: Die letzte Aufgabe eines Abschnitts ist die anspruchsvollste. Wer hängt, überspringt sie und geht mit der Demo weiter. Wenn die Zeit knapp wird, kürzen Sie die Aufgabenzeit von Abschnitt 3 und lassen `0.8` als Hausaufgabe, die Abschnitte 5 bis 7 haben Vorrang.
 
 ## Einstieg (0-5 min)
 
@@ -142,21 +142,21 @@ Alle Werte stammen aus der gebauten Datenbank (Seed 42).
 | 0.6 | 52 Zeilen |
 | 0.7 | 5 Haltestellen: Gottesauer Platz, Marktplatz, Europaplatz, Kronenplatz, Kaiserplatz |
 | 0.8 | 2 Haltestellen: Durlacher Tor, Durlach Turmberg |
-| 0.9 (Zusatz) | Linien `12` und `73` |
+| 0.9 | Linien `12` und `73` |
 | 0.10 | Platz 1: `id` 533, `S2`, Grötzingen, 12 Minuten. Plätze 2 bis 4 haben je 10 Minuten (`id` 473, 613, 806), Platz 5: `id` 453 mit 9 |
 | 0.11 | `id` 944 (234 Einsteiger), 540 (221), 919 (217) |
-| 0.13 (Zusatz) | Plätze 6 bis 10: alle 9 Minuten, `id` 457, 539, 542, 697, 703 |
+| 0.13 | Plätze 6 bis 10: alle 9 Minuten, `id` 457, 539, 542, 697, 703 |
 | 0.14 | 123 Halte bei Schnee |
 | 0.15 | 35997 Einsteiger, 3.99 Minuten im Schnitt, Maximum 12 |
 | 0.16 | 20 Haltestellen, 7 Linien (`Messe Süd` hat keine Halte in `delays`) |
 | 0.17 | `S2` 190 Halte / 19167 Einsteiger, `S1` 160 / 16830, `2` 240 / 14452, `1` 228 / 14513, `3` 160 / 11031, `12` 175 / 5711, `73` 175 / 4705 |
 | 0.18 | Zone 1: 4.23, Zone 2: 3.85, Zone 3: 3.8, Zone 4: 6.03 |
 | 0.19 | 6 Haltestellen: Pfinztal Berghausen 4.81, Ettlingen Stadt 4.15, Durlacher Tor 3.87, Grötzingen 3.76, Neureut Kirchfeld 3.69, Hauptbahnhof 3.55 |
-| 0.20 (Zusatz) | `S1` 76, `S2` 67, `73` 59, `1` 55, `12` 51 |
+| 0.20 | `S1` 76, `S2` 67, `73` 59, `1` 55, `12` 51 |
 | 0.21 | Meiste Einsteiger: 08 Uhr (15371), 17 Uhr (14643), 16 Uhr (14332), 07 Uhr (13451). Die Stunden 06, 12 und 20 liegen bei etwa 6000 bis 6900, 09, 13, 18 und 21 sind Randstunden einzelner Fahrten (wenige Zeilen) |
 | 0.22 | `sbahn` 350 Halte, 3.99, Maximum 12. `bus` 350, 3.44, 10. `tram` 628, 2.72, 10 |
 | 0.23 | `snow` 5.8, `rain` 4.3, `cloud` 2.8, `sun` 2.5 |
-| 0.24 (Zusatz) | `Hauptverkehr` 757 Halte mit 3.83, `sonst` 571 Halte mit 2.47 |
+| 0.24 | `Hauptverkehr` 757 Halte mit 3.83, `sonst` 571 Halte mit 2.47 |
 
 ### Diskussionsfragen für den Abschluss (86-90 min)
 

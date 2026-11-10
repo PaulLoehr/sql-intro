@@ -13,6 +13,19 @@ def test_schema_lists_tables_and_keys(tmp_path):
     assert {c["name"] for t in app.schema("flat") for c in t["columns"]} >= {"delay_min", "boarded"}
 
 
+def test_app_can_serve_a_single_sheet(tmp_path):
+    app = App(EXERCISES, tmp_path, sheet=1)
+    assert [s.number for s in app.sheets] == [1]
+    assert app.find("0.1") is None and app.find("1.1") is not None
+
+
+def test_unknown_sheet_is_rejected(tmp_path):
+    import pytest
+
+    with pytest.raises(ValueError):
+        App(EXERCISES, tmp_path, sheet=9)
+
+
 def test_find_returns_sheet_and_exercise(tmp_path):
     app = App(EXERCISES, tmp_path)
     sheet, exercise = app.find("0.1")
